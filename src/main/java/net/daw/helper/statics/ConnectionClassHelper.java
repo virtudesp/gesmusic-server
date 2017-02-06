@@ -44,7 +44,8 @@ public class ConnectionClassHelper {
         if (ConnectionClassHelper.getOpenShift()) {
             return System.getenv("OPENSHIFT_GEAR_NAME");
         } else {
-            return "sisane";
+            //return "sisane";
+            return "gesmusic";
         }
     }
 

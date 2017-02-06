@@ -45,8 +45,7 @@ public class TipoBean implements GenericBean{
 
     public void setDescripcion(String descripcion) {
         this.descripcion = descripcion;
-    }
-    
+    }   
     
     
     @Override

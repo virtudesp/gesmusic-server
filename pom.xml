@@ -7,7 +7,7 @@
     <version>1.0-SNAPSHOT</version>
     <packaging>war</packaging>
 
-    <name>sisane-server</name>
+    <name>gesmusic-server</name>
 
 
     <properties>
