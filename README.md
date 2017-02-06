@@ -1,6 +1,6 @@
-# sisane-server
+# gesmusic-server
 
-  * sisane-server provides a template to easy build small and medium AJAX projects with the following technologies:
+  * gesmusic-server provides a template to easy build small and medium AJAX projects with the following technologies:
     * J2EE servlets, MySQL, Gson, Maven, CORS, Bonecp, Layered architecture: control-service-dao-database
   * Because software development trends naturaly to be complex, sisane-server is intended to be easy and keep simple all the process. sisane-server is used to teach web application development to vocational students and to qualify them to join the workforce maket of developers in a tiny period of time. sisane-server was designed to avoid spaghetti code and complexity as far as possible, and brings an aid in structurate code development.
   * Provides a layered J2EE environment to easy server web development. 
