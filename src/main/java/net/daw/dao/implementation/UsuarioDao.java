@@ -192,15 +192,15 @@ public class UsuarioDao implements ViewDaoInterface<UsuarioBean>, TableDaoInterf
 
     public PusuarioBean getFromLogin(PusuarioBean oPuser) throws Exception {
         try {
-            String strId = oMysql.getId(strTable, "login", oPuser.getLogin());
+            String strId = oMysql.getId(strTable, "username", oPuser.getUsername());
             if (strId == null) {
                 oPuser.setId(0);
             } else {
                 Integer intId = Integer.parseInt(strId);
                 oPuser.setId(intId);
-                String pass = oPuser.getPassword();
-                oPuser.setPassword(oMysql.getOne(strSQL, "password", oPuser.getId()));
-                if (!pass.equals(oPuser.getPassword())) {
+                String pass = oPuser.getUserpass();
+                oPuser.setUserpass(oMysql.getOne(strSQL, "userpass", oPuser.getId()));
+                if (!pass.equals(oPuser.getUserpass())) {
                     oPuser.setId(0);
                 }
                 oPuser = this.getP(oPuser, AppConfigurationHelper.getJsonMsgDepth());

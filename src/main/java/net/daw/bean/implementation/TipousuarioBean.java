@@ -40,7 +40,7 @@ public class TipousuarioBean implements GenericBean {
     @Expose
     private Integer id = 0;
     @Expose
-    private String descripcion;
+    private String tipousuario;
 
 
     public TipousuarioBean() {
@@ -58,19 +58,19 @@ public class TipousuarioBean implements GenericBean {
         this.id = id;
     }
 
-    public String getDescription() {
-        return descripcion;
+    public String getTipousuario() {
+        return tipousuario;
     }
 
-    public void setDescription(String descripcion) {
-        this.descripcion = descripcion;
+    public void setTipousuario(String tipousuario) {
+        this.tipousuario = tipousuario;
     }
 
     @Override
     public String getColumns() {
         String strColumns = "";
         strColumns += "id,";
-        strColumns += "descripcion";
+        strColumns += "tipousuario";
         return strColumns;
     }
 
@@ -78,22 +78,21 @@ public class TipousuarioBean implements GenericBean {
     public String getValues() {
         String strColumns = "";
         strColumns += id + ",";
-        strColumns += EncodingUtilHelper.quotate(descripcion);
+        strColumns += EncodingUtilHelper.quotate(tipousuario);
         return strColumns;
     }
 
     @Override
     public String toPairs() {
         String strPairs = "";
-        //strPairs += "id=" + id + ",";
-        strPairs += "descripcion=" + EncodingUtilHelper.quotate(descripcion);
+        strPairs += "tipousuario=" + EncodingUtilHelper.quotate(tipousuario);
         return strPairs;
     }
 
     @Override
     public TipousuarioBean fill(ResultSet oResultSet, Connection pooledConnection, PusuarioBean oPuserBean_security, Integer expand) throws SQLException, Exception {
         this.setId(oResultSet.getInt("id"));
-        this.setDescription(oResultSet.getString("descripcion"));
+        this.setTipousuario(oResultSet.getString("tipousuario"));
         return this;
     }
 

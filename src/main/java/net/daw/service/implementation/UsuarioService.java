@@ -291,8 +291,8 @@ public class UsuarioService implements TableServiceInterface, ViewServiceInterfa
                         oDataConnectionSource = getSourceConnection();
                         oConnection = oDataConnectionSource.newConnection();
                         oPuser = new PusuarioBean();
-                        oPuser.setLogin(login);
-                        oPuser.setPassword(pass);
+                        oPuser.setUsername(login);
+                        oPuser.setUserpass(pass);
                         UsuarioDao oUserDao = new UsuarioDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), null);
                         oPuser = oUserDao.getFromLogin(oPuser);
                         if (oPuser.getId() != 0) {
