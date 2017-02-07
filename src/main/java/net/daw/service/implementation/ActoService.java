@@ -1,30 +1,7 @@
 /*
- * Copyright (c) 2016 by Rafael Angel Aznar Aparici (rafaaznar at gmail dot com)
- * 
- * bauxer server: Helps you to develop easily AJAX web applications 
- *                   by copying and modifying this Java Server.
- *
- * Sources at https://github.com/rafaelaznar/bauxer
- * 
- * bauxer server is distributed under the MIT License (MIT)
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
  */
 package net.daw.service.implementation;
 
@@ -34,11 +11,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
-import net.daw.bean.implementation.ZonaimagenBean;
-import net.daw.bean.implementation.ReplyBean;
 import net.daw.bean.implementation.PusuarioBean;
+import net.daw.bean.implementation.ReplyBean;
+import net.daw.bean.implementation.ActoBean;
 import net.daw.connection.publicinterface.ConnectionInterface;
-import net.daw.dao.implementation.ZonaimagenDao;
+import net.daw.dao.implementation.ActoDao;
 import net.daw.helper.statics.AppConfigurationHelper;
 import static net.daw.helper.statics.AppConfigurationHelper.getSourceConnection;
 import net.daw.helper.statics.FilterBeanHelper;
@@ -48,17 +25,17 @@ import net.daw.helper.statics.ParameterCook;
 import net.daw.service.publicinterface.TableServiceInterface;
 import net.daw.service.publicinterface.ViewServiceInterface;
 
-public class ZonaimagenService implements TableServiceInterface, ViewServiceInterface {
+public class ActoService implements TableServiceInterface, ViewServiceInterface {
 
     protected HttpServletRequest oRequest = null;
 
-    public ZonaimagenService(HttpServletRequest request) {
+    public ActoService(HttpServletRequest request) {
         oRequest = request;
     }
 
     private Boolean checkpermission(String strMethodName) throws Exception {
-        PusuarioBean oPusuarioBean = (PusuarioBean) oRequest.getSession().getAttribute("userBean");
-        if (oPusuarioBean != null) {
+        PusuarioBean oPuserBean = (PusuarioBean) oRequest.getSession().getAttribute("userBean");
+        if (oPuserBean != null) {
             return true;
         } else {
             return false;
@@ -73,10 +50,11 @@ public class ZonaimagenService implements TableServiceInterface, ViewServiceInte
             Connection oConnection = null;
             ConnectionInterface oDataConnectionSource = null;
             try {
+
                 oDataConnectionSource = getSourceConnection();
                 oConnection = oDataConnectionSource.newConnection();
-                ZonaimagenDao oZonaimagenDao = new ZonaimagenDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), null);
-                data = JsonMessage.getJsonExpression(200, Long.toString(oZonaimagenDao.getCount(alFilter)));
+                ActoDao oActoDao = new ActoDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), null);
+                data = JsonMessage.getJsonExpression(200, Long.toString(oActoDao.getCount(alFilter)));
             } catch (Exception ex) {
                 Log4j.errorLog(this.getClass().getName() + ":" + (ex.getStackTrace()[0]).getMethodName(), ex);
                 throw new Exception();
@@ -104,11 +82,11 @@ public class ZonaimagenService implements TableServiceInterface, ViewServiceInte
             try {
                 oDataConnectionSource = getSourceConnection();
                 oConnection = oDataConnectionSource.newConnection();
-                ZonaimagenDao oZonaimagenDao = new ZonaimagenDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), null);
-                ZonaimagenBean oZonaimagenBean = new ZonaimagenBean(id);
-                oZonaimagenBean = oZonaimagenDao.get(oZonaimagenBean, AppConfigurationHelper.getJsonMsgDepth());
+                ActoDao oActoDao = new ActoDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), null);
+                ActoBean oActoBean = new ActoBean(id);
+                oActoBean = oActoDao.get(oActoBean, AppConfigurationHelper.getJsonMsgDepth());
                 Gson gson = AppConfigurationHelper.getGson();
-                data = JsonMessage.getJsonExpression(200, AppConfigurationHelper.getGson().toJson(oZonaimagenBean));
+                data = JsonMessage.getJsonExpression(200, AppConfigurationHelper.getGson().toJson(oActoBean));
             } catch (Exception ex) {
                 Log4j.errorLog(this.getClass().getName() + ":" + (ex.getStackTrace()[0]).getMethodName(), ex);
                 throw new Exception();
@@ -137,8 +115,8 @@ public class ZonaimagenService implements TableServiceInterface, ViewServiceInte
             try {
                 oDataConnectionSource = getSourceConnection();
                 oConnection = oDataConnectionSource.newConnection();
-                ZonaimagenDao oZonaimagenDao = new ZonaimagenDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), null);
-                ArrayList<ZonaimagenBean> arrBeans = oZonaimagenDao.getAll(alFilter, hmOrder, AppConfigurationHelper.getJsonMsgDepth());
+                ActoDao oActoDao = new ActoDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), null);
+                ArrayList<ActoBean> arrBeans = oActoDao.getAll(alFilter, hmOrder, AppConfigurationHelper.getJsonMsgDepth());
                 data = JsonMessage.getJsonExpression(200, AppConfigurationHelper.getGson().toJson(arrBeans));
             } catch (Exception ex) {
                 Log4j.errorLog(this.getClass().getName() + ":" + (ex.getStackTrace()[0]).getMethodName(), ex);
@@ -170,8 +148,8 @@ public class ZonaimagenService implements TableServiceInterface, ViewServiceInte
             try {
                 oDataConnectionSource = getSourceConnection();
                 oConnection = oDataConnectionSource.newConnection();
-                ZonaimagenDao oZonaimagenDao = new ZonaimagenDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), null);
-                List<ZonaimagenBean> arrBeans = oZonaimagenDao.getPage(intRegsPerPag, intPage, alFilter, hmOrder, AppConfigurationHelper.getJsonMsgDepth());
+                ActoDao oActoDao = new ActoDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), null);
+                List<ActoBean> arrBeans = oActoDao.getPage(intRegsPerPag, intPage, alFilter, hmOrder, AppConfigurationHelper.getJsonMsgDepth());
                 data = JsonMessage.getJsonExpression(200, AppConfigurationHelper.getGson().toJson(arrBeans));
             } catch (Exception ex) {
                 Log4j.errorLog(this.getClass().getName() + ":" + (ex.getStackTrace()[0]).getMethodName(), ex);
@@ -201,8 +179,8 @@ public class ZonaimagenService implements TableServiceInterface, ViewServiceInte
                 oDataConnectionSource = getSourceConnection();
                 oConnection = oDataConnectionSource.newConnection();
                 oConnection.setAutoCommit(false);
-                ZonaimagenDao oZonaimagenDao = new ZonaimagenDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), null);
-                data = JsonMessage.getJsonExpression(200, (String) oZonaimagenDao.remove(id).toString());
+                ActoDao oActoDao = new ActoDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), null);
+                data = JsonMessage.getJsonExpression(200, (String) oActoDao.remove(id).toString());
                 oConnection.commit();
             } catch (Exception ex) {
                 if (oConnection != null) {
@@ -235,11 +213,11 @@ public class ZonaimagenService implements TableServiceInterface, ViewServiceInte
                 oDataConnectionSource = getSourceConnection();
                 oConnection = oDataConnectionSource.newConnection();
                 oConnection.setAutoCommit(false);
-                ZonaimagenDao oZonaimagenDao = new ZonaimagenDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), null);
-                ZonaimagenBean oZonaimagenBean = new ZonaimagenBean();
-                oZonaimagenBean = AppConfigurationHelper.getGson().fromJson(jason, oZonaimagenBean.getClass());
-                if (oZonaimagenBean != null) {
-                    Integer iResult = oZonaimagenDao.set(oZonaimagenBean);
+                ActoDao oActoDao = new ActoDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), null);
+                ActoBean oActoBean = new ActoBean();
+                oActoBean = AppConfigurationHelper.getGson().fromJson(jason, oActoBean.getClass());
+                if (oActoBean != null) {
+                    Integer iResult = oActoDao.set(oActoBean);
                     if (iResult >= 1) {
                         oReplyBean.setCode(200);
                         oReplyBean.setJson(JsonMessage.getJsonExpression(200, iResult.toString()));

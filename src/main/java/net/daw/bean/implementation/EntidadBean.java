@@ -50,8 +50,8 @@ public class EntidadBean implements GenericBean {
 
     @Expose(serialize = false)
     private Integer id_tipoentidad = 0;
-    @Expose(deserialize = false)
-    private TipomuestraBean obj_tipoentidad = null;
+  /*  @Expose(deserialize = false)
+    private TipoentidadBean obj_tipoentidad = null;*/
 
 
     public EntidadBean() {
@@ -189,13 +189,13 @@ public class EntidadBean implements GenericBean {
         this.id_tipoentidad = id_tipoentidad;
     }
 
-    public TipomuestraBean getObj_tipoentidad() {
+   /* public TipoentidadBean getObj_tipoentidad() {
         return obj_tipoentidad;
     }
 
-    public void setObj_tipoentidad(TipomuestraBean obj_tipoentidad) {
+    public void setObj_tipoentidad(TipoentidadBean obj_tipoentidad) {
         this.obj_tipoentidad = obj_tipoentidad;
-    }
+    }*/
 
     public Integer getId() {
         return id;

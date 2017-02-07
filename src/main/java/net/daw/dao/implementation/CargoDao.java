@@ -5,7 +5,6 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.HashMap;
 import net.daw.bean.implementation.CargoBean;
-import net.daw.bean.implementation.DiagnosticoBean;
 import net.daw.bean.implementation.PusuarioBean;
 import net.daw.dao.publicinterface.TableDaoInterface;
 import net.daw.dao.publicinterface.ViewDaoInterface;

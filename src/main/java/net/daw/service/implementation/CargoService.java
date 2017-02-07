@@ -39,7 +39,6 @@ import net.daw.bean.implementation.PusuarioBean;
 import net.daw.bean.implementation.ReplyBean;
 import net.daw.connection.publicinterface.ConnectionInterface;
 import net.daw.dao.implementation.CargoDao;
-import net.daw.dao.implementation.DiagnosticoDao;
 import net.daw.helper.statics.AppConfigurationHelper;
 import static net.daw.helper.statics.AppConfigurationHelper.getSourceConnection;
 import net.daw.helper.statics.FilterBeanHelper;
@@ -76,8 +75,8 @@ public class CargoService implements TableServiceInterface, ViewServiceInterface
             try {
                 oDataConnectionSource = getSourceConnection();
                 oConnection = oDataConnectionSource.newConnection();
-                DiagnosticoDao oDiagnosticoDao = new DiagnosticoDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), null);
-                data = JsonMessage.getJsonExpression(200, Long.toString(oDiagnosticoDao.getCount(alFilter)));
+               // DiagnosticoDao oDiagnosticoDao = new DiagnosticoDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), null);
+               // data = JsonMessage.getJsonExpression(200, Long.toString(oDiagnosticoDao.getCount(alFilter)));
             } catch (Exception ex) {
                 Log4j.errorLog(this.getClass().getName() + ":" + (ex.getStackTrace()[0]).getMethodName(), ex);
                 throw new Exception();
