@@ -28,7 +28,6 @@
  */
 package net.daw.service.implementation;
 
-import com.google.gson.Gson;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.HashMap;

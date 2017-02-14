@@ -11,6 +11,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
 import net.daw.bean.publicinterface.GenericBean;
+import net.daw.dao.implementation.SociedadDao;
 import net.daw.helper.statics.EncodingUtilHelper;
 
 public class EntidadBean implements GenericBean {
@@ -49,9 +50,9 @@ public class EntidadBean implements GenericBean {
     private Date fecha_baja;
 
     @Expose(serialize = false)
-    private Integer id_tipoentidad = 0;
-  /*  @Expose(deserialize = false)
-    private TipoentidadBean obj_tipoentidad = null;*/
+    private Integer id_sociedad = 0;
+   @Expose(deserialize = false)
+    private SociedadBean obj_sociedad = null;
 
 
     public EntidadBean() {
@@ -181,21 +182,21 @@ public class EntidadBean implements GenericBean {
         this.fecha_baja = fecha_baja;
     }
 
-    public Integer getId_tipoentidad() {
-        return id_tipoentidad;
+    public Integer getId_sociedad() {
+        return id_sociedad;
     }
 
-    public void setId_tipoentidad(Integer id_tipoentidad) {
-        this.id_tipoentidad = id_tipoentidad;
+    public void setId_sociedad(Integer id_sociedad) {
+        this.id_sociedad = id_sociedad;
     }
 
-   /* public TipoentidadBean getObj_tipoentidad() {
-        return obj_tipoentidad;
+    public SociedadBean getObj_sociedad() {
+        return obj_sociedad;
     }
 
-    public void setObj_tipoentidad(TipoentidadBean obj_tipoentidad) {
-        this.obj_tipoentidad = obj_tipoentidad;
-    }*/
+    public void setObj_tipoentidad(SociedadBean obj_sociedad) {
+        this.obj_sociedad = obj_sociedad;
+    }
 
     public Integer getId() {
         return id;
@@ -203,9 +204,7 @@ public class EntidadBean implements GenericBean {
 
     public void setId(Integer id) {
         this.id = id;
-    }
-
-    
+    }    
 
     @Override
     public String getColumns() {
@@ -226,7 +225,7 @@ public class EntidadBean implements GenericBean {
         strColumns += "web,";
         strColumns += "fecha_alta,";
         strColumns += "fecha_baja,";
-        strColumns += "id_tipoentidad";
+        strColumns += "id_sociedad";
         return strColumns;
     }
 
@@ -249,7 +248,7 @@ public class EntidadBean implements GenericBean {
         strColumns += EncodingUtilHelper.quotate(getWeb()) + ",";
         strColumns += EncodingUtilHelper.stringifyAndQuotate(fecha_alta) + ",";
         strColumns += EncodingUtilHelper.stringifyAndQuotate(fecha_baja) + ",";
-        strColumns += getId_tipoentidad();
+        strColumns += getId_sociedad();
         return strColumns;
     }
 
@@ -271,7 +270,7 @@ public class EntidadBean implements GenericBean {
         strPairs += "web=" + EncodingUtilHelper.quotate(web) + ",";
         strPairs += "fecha_alta=" + EncodingUtilHelper.stringifyAndQuotate(fecha_alta) + ",";
         strPairs += "fecha_baja=" + EncodingUtilHelper.stringifyAndQuotate(fecha_baja) + ",";
-        strPairs += "id_tipoentidad=" + id_tipoentidad;
+        strPairs += "id_sociedad=" + id_sociedad;
         return strPairs;
     }
 
@@ -294,15 +293,15 @@ public class EntidadBean implements GenericBean {
         this.setFecha_alta(oResultSet.getTimestamp("fecha_alta"));
         this.setFecha_baja(oResultSet.getTimestamp("fecha_baja"));
 
-        /*if (expand > 0) {
-            TipoentidadBean oTipoentidadBean = new TipoentidadBean();
-            TipoentidadDao oTipomuestraDao = new TipoentidadDao(pooledConnection, oPuserBean_security, null);
-            oTipoentidadBean.setId(oResultSet.getInt("id_tipoentidad"));
-            oTipoentidadBean = oTipomuestraDao.get(oTipoentidadBean, expand - 1);
-            this.setObj_tipoentidad(oTipoentidadBean);
+        if (expand > 0) {
+            SociedadBean oSociedadBean = new SociedadBean();
+            SociedadDao oTipomuestraDao = new SociedadDao(pooledConnection, oPuserBean_security, null);
+            oSociedadBean.setId(oResultSet.getInt("id_sociedad"));
+            oSociedadBean = oTipomuestraDao.get(oSociedadBean, expand - 1);
+            this.setObj_tipoentidad(oSociedadBean);
         } else {
-            this.setId_tipoentidad(oResultSet.getInt("id_tipoentidad"));
-        }*/
+            this.setId_sociedad(oResultSet.getInt("id_sociedad"));
+        }
 
         return this;
     }
