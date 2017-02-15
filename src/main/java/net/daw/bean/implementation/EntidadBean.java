@@ -194,7 +194,7 @@ public class EntidadBean implements GenericBean {
         return obj_sociedad;
     }
 
-    public void setObj_tipoentidad(SociedadBean obj_sociedad) {
+    public void setObj_sociedad(SociedadBean obj_sociedad) {
         this.obj_sociedad = obj_sociedad;
     }
 
@@ -295,10 +295,10 @@ public class EntidadBean implements GenericBean {
 
         if (expand > 0) {
             SociedadBean oSociedadBean = new SociedadBean();
-            SociedadDao oTipomuestraDao = new SociedadDao(pooledConnection, oPuserBean_security, null);
+            SociedadDao oSociedadDao = new SociedadDao(pooledConnection, oPuserBean_security, null);
             oSociedadBean.setId(oResultSet.getInt("id_sociedad"));
-            oSociedadBean = oTipomuestraDao.get(oSociedadBean, expand - 1);
-            this.setObj_tipoentidad(oSociedadBean);
+            oSociedadBean = oSociedadDao.get(oSociedadBean, expand - 1);
+            this.setObj_sociedad(oSociedadBean);
         } else {
             this.setId_sociedad(oResultSet.getInt("id_sociedad"));
         }
