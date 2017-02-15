@@ -81,7 +81,7 @@ public class json extends HttpServlet {
             try {
                 Class.forName("com.mysql.jdbc.Driver");
             } catch (Exception ex) {
-                ReplyBean oReplyBean = new ReplyBean(500, "sisane-server error. Please, contact your administrator.");
+                ReplyBean oReplyBean = new ReplyBean(500, "gesmusic-server error. Please, contact your administrator.");
                 sendResponseJson(request, response, oReplyBean);
                 Log4j.errorLog(this.getClass().getName() + ":" + (ex.getStackTrace()[0]).getMethodName(), ex);
                 return;
@@ -98,12 +98,12 @@ public class json extends HttpServlet {
                     oDataConnectionSource = getSourceConnection();
                     oConnection = oDataConnectionSource.newConnection();
                     if (oConnection.isValid(10)) {
-                        sendResponseHtml(request, response, "sisane-server by rafael aznar", "<p>the server is up and running on " + request.getLocalName() + ":" + request.getLocalPort() + "</p><p>Database name: " + ConnectionClassHelper.getDatabaseName() + "</p><p>Database access OK</p>");
+                        sendResponseHtml(request, response, "gesmusic-server by virtudes planells", "<p>the server is up and running on " + request.getLocalName() + ":" + request.getLocalPort() + "</p><p>Database name: " + ConnectionClassHelper.getDatabaseName() + "</p><p>Database access OK</p>");
                     } else {
-                        sendResponseHtml(request, response, "sisane-server by rafael aznar", "<p>the server is up and running on " + request.getLocalName() + ":" + request.getLocalPort() + "</p><p>Database name: " + ConnectionClassHelper.getDatabaseName() + "</p><p>Database access timeout KO</p>");
+                        sendResponseHtml(request, response, "gesmusic-server by virtudes planells", "<p>the server is up and running on " + request.getLocalName() + ":" + request.getLocalPort() + "</p><p>Database name: " + ConnectionClassHelper.getDatabaseName() + "</p><p>Database access timeout KO</p>");
                     }
                 } catch (Exception ex) {
-                    sendResponseHtml(request, response, "sisane-server by rafael aznar", "the server is up and running on " + request.getLocalName() + ":" + request.getLocalPort() + "</p><p>Database name: " + ConnectionClassHelper.getDatabaseName() + "</p><p>Database access KO</p>");
+                    sendResponseHtml(request, response, "gesmusic-server by virtudes planells", "the server is up and running on " + request.getLocalName() + ":" + request.getLocalPort() + "</p><p>Database name: " + ConnectionClassHelper.getDatabaseName() + "</p><p>Database access KO</p>");
                 } finally {
                     if (oConnection != null) {
                         oConnection.close();
@@ -120,13 +120,13 @@ public class json extends HttpServlet {
                     ReplyBean oResult = (ReplyBean) oMethodService.invoke(oService);
                     sendResponseJson(request, response, oResult);
                 } catch (ClassNotFoundException | InstantiationException | IllegalAccessException ex) {
-                    ReplyBean oReplyBean = new ReplyBean(500, "sisane-server error. Please, contact your administrator.");
+                    ReplyBean oReplyBean = new ReplyBean(500, "gesmusic-server error2. Please, contact your administrator.");
                     sendResponseJson(request, response, oReplyBean);
                     Log4j.errorLog(this.getClass().getName() + ":" + (ex.getStackTrace()[0]).getMethodName(), ex);
                 }
             }
         } catch (ServletException | IOException | NoSuchMethodException | SecurityException | IllegalArgumentException | InvocationTargetException ex) {
-            ReplyBean oReplyBean = new ReplyBean(500, "sisane-server error. Please, contact your administrator.");
+            ReplyBean oReplyBean = new ReplyBean(500, "gesmusic-server error3. Please, contact your administrator.");
             sendResponseJson(request, response, oReplyBean);
             Log4j.errorLog(this.getClass().getName() + ":" + (ex.getStackTrace()[0]).getMethodName(), ex);
         }

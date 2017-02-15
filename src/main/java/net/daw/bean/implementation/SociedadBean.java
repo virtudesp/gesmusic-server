@@ -30,7 +30,7 @@ public class SociedadBean implements GenericBean {
     @Expose
     private String provincia;
     @Expose
-    private String pais;
+    private int pais;
     @Expose
     private String codigopostal;
     @Expose
@@ -104,11 +104,11 @@ public class SociedadBean implements GenericBean {
         this.provincia = provincia;
     }
 
-    public String getPais() {
+    public Integer getPais() {
         return pais;
     }
 
-    public void setPais(String pais) {
+    public void setPais(Integer pais) {
         this.pais = pais;
     }
 
@@ -172,7 +172,7 @@ public class SociedadBean implements GenericBean {
         strColumns += EncodingUtilHelper.quotate(getDireccion()) + ",";
         strColumns += EncodingUtilHelper.quotate(getPoblacion()) + ",";
         strColumns += EncodingUtilHelper.quotate(getProvincia()) + ",";
-        strColumns += EncodingUtilHelper.quotate(getPais()) + ",";
+        strColumns += getPais() + ",";
         strColumns += EncodingUtilHelper.quotate(getCodigopostal()) + ",";
         strColumns += EncodingUtilHelper.quotate(getTelefono()) + ",";
         strColumns += EncodingUtilHelper.quotate(getEmail()) + ",";
@@ -189,7 +189,7 @@ public class SociedadBean implements GenericBean {
         strPairs += "direccion=" + EncodingUtilHelper.quotate(direccion) + ",";
         strPairs += "poblacion=" + EncodingUtilHelper.quotate(poblacion) + ",";
         strPairs += "provincia=" + EncodingUtilHelper.quotate(provincia) + ",";
-        strPairs += "pais=" + EncodingUtilHelper.quotate(pais) + ",";
+        strPairs += "pais=" + pais + ",";
         strPairs += "codigopostal=" + EncodingUtilHelper.quotate(codigopostal) + ",";
         strPairs += "telefono=" + EncodingUtilHelper.quotate(telefono) + ",";
         strPairs += "email=" + EncodingUtilHelper.quotate(email) + ",";
@@ -206,7 +206,7 @@ public class SociedadBean implements GenericBean {
         this.setDireccion(oResultSet.getString("direccion"));
         this.setPoblacion(oResultSet.getString("poblacion"));
         this.setProvincia(oResultSet.getString("provincia"));
-        this.setPais(oResultSet.getString("pais"));
+        this.setPais(oResultSet.getInt("pais"));
         this.setCodigopostal(oResultSet.getString("codigopostal"));
         this.setTelefono(oResultSet.getString("telefono"));
         this.setEmail(oResultSet.getString("email"));
