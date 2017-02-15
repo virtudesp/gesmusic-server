@@ -39,17 +39,17 @@ import net.daw.control.json;
 public class Log4j {
 
     public static void infoLog(String strMessage) {
-        Logger log = Logger.getLogger("sisane-server");
+        Logger log = Logger.getLogger("gesmusic-server");
         log.info(strMessage);
     }
 
     public static void errorLog(String strMessage, Exception e) {
-        Logger log = Logger.getLogger("sisane-server");
+        Logger log = Logger.getLogger("gesmusic-server");
         log.error(strMessage, e);
     }
 
     public static void errorLog(String strMessage) {
-        Logger log = Logger.getLogger("sisane-server");
+        Logger log = Logger.getLogger("gesmusic-server");
         log.error(strMessage);
     }
 
