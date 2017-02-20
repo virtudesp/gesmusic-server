@@ -33,27 +33,22 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import net.daw.bean.publicinterface.GenericBean;
-import net.daw.dao.implementation.TipousuarioDao;
 import net.daw.helper.statics.EncodingUtilHelper;
 
-public class UsuarioBean implements GenericBean {
+public class TipoentidadBean implements GenericBean {
 
     @Expose
     private Integer id = 0;
     @Expose
-    private String username;
+    private String tipoentidad;
     @Expose
-    private String userpass;
+    private String inicial;
 
-    @Expose(serialize = false)
-    private Integer id_tipousuario = 0;
-    @Expose(deserialize = false)
-    private TipousuarioBean obj_tipousuario = null;
 
-    public UsuarioBean() {
+    public TipoentidadBean() {
     }
 
-    public UsuarioBean(Integer id) {
+    public TipoentidadBean(Integer id) {
         this.id = id;
     }
 
@@ -65,45 +60,28 @@ public class UsuarioBean implements GenericBean {
         this.id = id;
     }
 
-    public String getUsername() {
-        return username;
+    public String getTipoentidad() {
+        return tipoentidad;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setTipoentidad(String tipoentidad) {
+        this.tipoentidad = tipoentidad;
     }
 
-    public String getUserpass() {
-        return userpass;
+    public String getInicial() {
+        return inicial;
     }
 
-    public void setUserpass(String userpass) {
-        this.userpass = userpass;
-    }
-
-    public Integer getId_tipousuario() {
-        return id_tipousuario;
-    }
-
-    public void setId_tipousuario(Integer id_tipousuario) {
-        this.id_tipousuario = id_tipousuario;
-    }
-
-    public TipousuarioBean getObj_tipousuario() {
-        return obj_tipousuario;
-    }
-
-    public void setObj_tipousuario(TipousuarioBean obj_tipousuario) {
-        this.obj_tipousuario = obj_tipousuario;
+    public void setInicial(String inicial) {
+        this.inicial = inicial;
     }
 
     @Override
     public String getColumns() {
         String strColumns = "";
         strColumns += "id,";
-        strColumns += "username,";
-        strColumns += "userpass,";
-        strColumns += "id_tipousuario";
+        strColumns += "tipoentidad,";
+        strColumns += "inicial";
         return strColumns;
     }
 
@@ -111,38 +89,25 @@ public class UsuarioBean implements GenericBean {
     public String getValues() {
         String strColumns = "";
         strColumns += id + ",";
-        strColumns += EncodingUtilHelper.quotate(username) + ",";
-        strColumns += EncodingUtilHelper.quotate(userpass) + ",";
-        strColumns += id_tipousuario;
+        strColumns += EncodingUtilHelper.quotate(tipoentidad) + ",";
+        strColumns += EncodingUtilHelper.quotate(inicial);
         return strColumns;
     }
 
     @Override
     public String toPairs() {
         String strPairs = "";
-        strPairs += "username=" + EncodingUtilHelper.quotate(username) + ",";
-        strPairs += "userpass=" + EncodingUtilHelper.quotate(userpass) + ",";
-        strPairs += "id_tipousuario=" + id_tipousuario;
+        strPairs += "tipoentidad=" + EncodingUtilHelper.quotate(tipoentidad);
+        strPairs += "tipoentidad=" + EncodingUtilHelper.quotate(inicial);
         return strPairs;
     }
 
     @Override
-    public UsuarioBean fill(ResultSet oResultSet, Connection pooledConnection, PusuarioBean oPuserBean_security, Integer expand) throws SQLException, Exception {
+    public TipoentidadBean fill(ResultSet oResultSet, Connection pooledConnection, PusuarioBean oPuserBean_security, Integer expand) throws SQLException, Exception {
         this.setId(oResultSet.getInt("id"));
-        this.setUsername(oResultSet.getString("username"));
-        this.setUserpass(oResultSet.getString("userpass"));
-        
-        if (expand > 0) {
-            TipousuarioBean oTipousuarioBean = new TipousuarioBean();
-            TipousuarioDao oTipousuarioDao = new TipousuarioDao(pooledConnection, oPuserBean_security, null);
-            oTipousuarioBean.setId(oResultSet.getInt("id_tipousuario"));
-            oTipousuarioBean = oTipousuarioDao.get(oTipousuarioBean, expand - 1);
-            this.setObj_tipousuario(oTipousuarioBean);
-            //this.setIdUsuario
-        } else {
-            this.setId_tipousuario(oResultSet.getInt("id_tipousuario"));
-        }
-        
+        this.setTipoentidad(oResultSet.getString("tipoentidad"));
+        this.setTipoentidad(oResultSet.getString("inicial"));
         return this;
     }
+
 }

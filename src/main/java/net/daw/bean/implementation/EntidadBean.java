@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import java.util.Date;
 import net.daw.bean.publicinterface.GenericBean;
 import net.daw.dao.implementation.SociedadDao;
+import net.daw.dao.implementation.TipoentidadDao;
 import net.daw.helper.statics.EncodingUtilHelper;
 
 public class EntidadBean implements GenericBean {
@@ -54,6 +55,11 @@ public class EntidadBean implements GenericBean {
    @Expose(deserialize = false)
     private SociedadBean obj_sociedad = null;
 
+    @Expose(serialize = false)
+    private Integer id_tipoentidad = 0;
+   @Expose(deserialize = false)
+    private TipoentidadBean obj_tipoentidad = null;
+
 
     public EntidadBean() {
     }
@@ -61,6 +67,14 @@ public class EntidadBean implements GenericBean {
     public EntidadBean(Integer id) {
         this.id = id;
     }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }   
 
     public String getNumero() {
         return numero;
@@ -196,15 +210,23 @@ public class EntidadBean implements GenericBean {
 
     public void setObj_sociedad(SociedadBean obj_sociedad) {
         this.obj_sociedad = obj_sociedad;
+    } 
+
+    public Integer getId_tipoentidad() {
+        return id_tipoentidad;
     }
 
-    public Integer getId() {
-        return id;
+    public void setId_tipoentidad(Integer id_tipoentidad) {
+        this.id_tipoentidad = id_tipoentidad;
     }
 
-    public void setId(Integer id) {
-        this.id = id;
-    }    
+    public TipoentidadBean getObj_tipoentidad() {
+        return obj_tipoentidad;
+    }
+
+    public void setObj_tipoentidad(TipoentidadBean obj_tipoentidad) {
+        this.obj_tipoentidad = obj_tipoentidad;
+    }
 
     @Override
     public String getColumns() {
@@ -225,7 +247,8 @@ public class EntidadBean implements GenericBean {
         strColumns += "web,";
         strColumns += "fecha_alta,";
         strColumns += "fecha_baja,";
-        strColumns += "id_sociedad";
+        strColumns += "id_sociedad,";
+        strColumns += "id_tipoentidad";
         return strColumns;
     }
 
@@ -248,7 +271,8 @@ public class EntidadBean implements GenericBean {
         strColumns += EncodingUtilHelper.quotate(getWeb()) + ",";
         strColumns += EncodingUtilHelper.stringifyAndQuotate(fecha_alta) + ",";
         strColumns += EncodingUtilHelper.stringifyAndQuotate(fecha_baja) + ",";
-        strColumns += getId_sociedad();
+        strColumns += getId_sociedad() + ",";
+        strColumns += getId_tipoentidad();
         return strColumns;
     }
 
@@ -270,7 +294,8 @@ public class EntidadBean implements GenericBean {
         strPairs += "web=" + EncodingUtilHelper.quotate(web) + ",";
         strPairs += "fecha_alta=" + EncodingUtilHelper.stringifyAndQuotate(fecha_alta) + ",";
         strPairs += "fecha_baja=" + EncodingUtilHelper.stringifyAndQuotate(fecha_baja) + ",";
-        strPairs += "id_sociedad=" + id_sociedad;
+        strPairs += "id_sociedad=" + id_sociedad + ",";
+        strPairs += "id_sociedad=" + id_tipoentidad;
         return strPairs;
     }
 
@@ -301,6 +326,16 @@ public class EntidadBean implements GenericBean {
             this.setObj_sociedad(oSociedadBean);
         } else {
             this.setId_sociedad(oResultSet.getInt("id_sociedad"));
+        }
+
+        if (expand > 0) {
+            TipoentidadBean oTipoentidadBean = new TipoentidadBean();
+            TipoentidadDao oTipoentidadDao = new TipoentidadDao(pooledConnection, oPuserBean_security, null);
+            oTipoentidadBean.setId(oResultSet.getInt("id_tipoentidad"));
+            oTipoentidadBean = oTipoentidadDao.get(oTipoentidadBean, expand - 1);
+            this.setObj_tipoentidad(oTipoentidadBean);
+        } else {
+            this.setId_tipoentidad(oResultSet.getInt("id_tipoentidad"));
         }
 
         return this;
