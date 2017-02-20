@@ -44,7 +44,7 @@ import net.daw.helper.statics.SqlBuilder;
 public class TipoentidadDao implements ViewDaoInterface<TipoentidadBean>, TableDaoInterface<TipoentidadBean> {
 
     private String strTable = "tipoentidad";
-    private String strSQL = "select * from tipoentidad where 1=1 ";
+    private String strSQL = "select * from " + strTable + " where 1=1 ";
     private MysqlData oMysql = null;
     private Connection oConnection = null;
     private PusuarioBean oPuserSecurity = null;

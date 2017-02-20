@@ -295,7 +295,7 @@ public class EntidadBean implements GenericBean {
         strPairs += "fecha_alta=" + EncodingUtilHelper.stringifyAndQuotate(fecha_alta) + ",";
         strPairs += "fecha_baja=" + EncodingUtilHelper.stringifyAndQuotate(fecha_baja) + ",";
         strPairs += "id_sociedad=" + id_sociedad + ",";
-        strPairs += "id_sociedad=" + id_tipoentidad;
+        strPairs += "id_tipoentidad=" + id_tipoentidad;
         return strPairs;
     }
 

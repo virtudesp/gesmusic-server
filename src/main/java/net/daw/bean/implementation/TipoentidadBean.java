@@ -97,8 +97,8 @@ public class TipoentidadBean implements GenericBean {
     @Override
     public String toPairs() {
         String strPairs = "";
-        strPairs += "tipoentidad=" + EncodingUtilHelper.quotate(tipoentidad);
-        strPairs += "tipoentidad=" + EncodingUtilHelper.quotate(inicial);
+        strPairs += "tipoentidad=" + EncodingUtilHelper.quotate(tipoentidad) + ",";
+        strPairs += "inicial=" + EncodingUtilHelper.quotate(inicial);
         return strPairs;
     }
 
@@ -106,7 +106,7 @@ public class TipoentidadBean implements GenericBean {
     public TipoentidadBean fill(ResultSet oResultSet, Connection pooledConnection, PusuarioBean oPuserBean_security, Integer expand) throws SQLException, Exception {
         this.setId(oResultSet.getInt("id"));
         this.setTipoentidad(oResultSet.getString("tipoentidad"));
-        this.setTipoentidad(oResultSet.getString("inicial"));
+        this.setInicial(oResultSet.getString("inicial"));
         return this;
     }
 
