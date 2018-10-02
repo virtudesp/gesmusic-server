@@ -6,6 +6,8 @@
 package net.daw.service.implementation;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -206,6 +208,23 @@ public class ActoService implements TableServiceInterface, ViewServiceInterface 
     public ReplyBean set() throws Exception {
         if (this.checkpermission("set")) {
             String jason = ParameterCook.prepareJson(oRequest);
+            // Se necesita el id para diferenciar un insert de un update enviando como parámetro where al crear oEntidadBean 
+            JsonParser parser = new JsonParser();
+            JsonElement elementObject = parser.parse(jason);
+            String strRequestId;
+            try{
+                strRequestId = elementObject.getAsJsonObject().get("id").getAsString();
+            } catch (Exception e){
+                strRequestId = "0";
+            }
+            Integer requestId = Integer.parseInt(strRequestId);
+            String where = "";
+            if (requestId == 0) {
+                where = null;
+            } else {
+                where += " where id=" + requestId;
+            }
+            // hasta aquí lo que he añadido yo
             ReplyBean oReplyBean = new ReplyBean();
             Connection oConnection = null;
             ConnectionInterface oDataConnectionSource = null;
@@ -213,8 +232,15 @@ public class ActoService implements TableServiceInterface, ViewServiceInterface 
                 oDataConnectionSource = getSourceConnection();
                 oConnection = oDataConnectionSource.newConnection();
                 oConnection.setAutoCommit(false);
-                ActoDao oActoDao = new ActoDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), null);
-                ActoBean oActoBean = new ActoBean();
+                //ActoDao oActoDao = new ActoDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), null);
+                //ActoBean oActoBean = new ActoBean();
+                ActoDao oActoDao = new ActoDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), where);
+                ActoBean oActoBean;
+                if (requestId == 0) {
+                    oActoBean = new ActoBean();
+                } else {
+                    oActoBean = new ActoBean(requestId);
+                }
                 oActoBean = AppConfigurationHelper.getGson().fromJson(jason, oActoBean.getClass());
                 if (oActoBean != null) {
                     Integer iResult = oActoDao.set(oActoBean);
@@ -223,11 +249,11 @@ public class ActoService implements TableServiceInterface, ViewServiceInterface 
                         oReplyBean.setJson(JsonMessage.getJsonExpression(200, iResult.toString()));
                     } else {
                         oReplyBean.setCode(500);
-                        oReplyBean.setJson(JsonMessage.getJsonMsg(500, "Error during registry set"));
+                        oReplyBean.setJson(JsonMessage.getJsonMsg(500, "Error during registry set1"));
                     }
                 } else {
                     oReplyBean.setCode(500);
-                    oReplyBean.setJson(JsonMessage.getJsonMsg(500, "Error during registry set"));
+                    oReplyBean.setJson(JsonMessage.getJsonMsg(500, "Error during registry set2"));
                 }
                 oConnection.commit();
             } catch (Exception ex) {

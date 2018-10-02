@@ -120,9 +120,18 @@ public class UsuarioBean implements GenericBean {
     @Override
     public String toPairs() {
         String strPairs = "";
-        strPairs += "username=" + EncodingUtilHelper.quotate(username) + ",";
-        strPairs += "userpass=" + EncodingUtilHelper.quotate(userpass) + ",";
-        strPairs += "id_tipousuario=" + id_tipousuario;
+//        strPairs += "username=" + EncodingUtilHelper.quotate(username) + ",";
+//        strPairs += "userpass=" + EncodingUtilHelper.quotate(userpass) + ",";
+//        strPairs += "id_tipousuario=" + id_tipousuario;
+        Boolean hay = false;
+        if (username != null) {
+            strPairs += "username=" + EncodingUtilHelper.quotate(username);
+            hay = true;
+        }
+        if (userpass != null) {
+            strPairs += (hay) ? ",userpass=" : "userpass=";
+            strPairs += EncodingUtilHelper.quotate(userpass);
+        }
         return strPairs;
     }
 

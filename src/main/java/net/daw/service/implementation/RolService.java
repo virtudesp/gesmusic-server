@@ -28,7 +28,8 @@
  */
 package net.daw.service.implementation;
 
-import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -227,6 +228,23 @@ public class RolService implements TableServiceInterface, ViewServiceInterface {
     public ReplyBean set() throws Exception {
         if (this.checkpermission("set")) {
             String jason = ParameterCook.prepareJson(oRequest);
+            // Se necesita el id para diferenciar un insert de un update enviando como parámetro where al crear oEntidadBean 
+            JsonParser parser = new JsonParser();
+            JsonElement elementObject = parser.parse(jason);
+            String strRequestId;
+            try{
+                strRequestId = elementObject.getAsJsonObject().get("id").getAsString();
+            } catch (Exception e){
+                strRequestId = "0";
+            }
+            Integer requestId = Integer.parseInt(strRequestId);
+            String where = "";
+            if (requestId == 0) {
+                where = null;
+            } else {
+                where += " where id=" + requestId;
+            }
+            // hasta aquí lo que he añadido yo
             ReplyBean oReplyBean = new ReplyBean();
             Connection oConnection = null;
             ConnectionInterface oDataConnectionSource = null;
@@ -234,8 +252,15 @@ public class RolService implements TableServiceInterface, ViewServiceInterface {
                 oDataConnectionSource = getSourceConnection();
                 oConnection = oDataConnectionSource.newConnection();
                 oConnection.setAutoCommit(false);
-                RolDao oRolDao = new RolDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), null);
-                RolBean oRolBean = new RolBean();
+//                RolDao oRolDao = new RolDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), null);
+//                RolBean oRolBean = new RolBean();
+                RolDao oRolDao = new RolDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), where);
+                RolBean oRolBean;
+                if (requestId == 0) {
+                    oRolBean = new RolBean();
+                } else {
+                    oRolBean = new RolBean(requestId);
+                }
                 oRolBean = AppConfigurationHelper.getGson().fromJson(jason, oRolBean.getClass());
                 if (oRolBean != null) {
                     Integer iResult = oRolDao.set(oRolBean);

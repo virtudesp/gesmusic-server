@@ -35,6 +35,6 @@ package net.daw.helper.statics;
 public class AppInformationHelper {
 
     public static String getAppName() {
-        return System.getProperty("sisane-server");
+        return System.getProperty("gesmusic-server");
     }
 }

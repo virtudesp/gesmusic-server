@@ -29,6 +29,8 @@
 package net.daw.service.implementation;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -228,6 +230,22 @@ public class CompositorService implements TableServiceInterface, ViewServiceInte
     public ReplyBean set() throws Exception {
         if (this.checkpermission("set")) {
             String jason = ParameterCook.prepareJson(oRequest);
+            // Se necesita el id para diferenciar un insert de un update enviando como parámetro where al crear oEntidadBean 
+            JsonParser parser = new JsonParser();
+            JsonElement elementObject = parser.parse(jason);
+            String strRequestId;
+            try{
+                strRequestId = elementObject.getAsJsonObject().get("id").getAsString();
+            } catch (Exception e){
+                strRequestId = "0";
+            }
+            Integer requestId = Integer.parseInt(strRequestId);
+            String where = "";
+            if (requestId == 0) {
+                where = null;
+            } else {
+                where += " where id=" + requestId;
+            }
             ReplyBean oReplyBean = new ReplyBean();
             Connection oConnection = null;
             ConnectionInterface oDataConnectionSource = null;
@@ -235,11 +253,15 @@ public class CompositorService implements TableServiceInterface, ViewServiceInte
                 oDataConnectionSource = getSourceConnection();
                 oConnection = oDataConnectionSource.newConnection();
                 oConnection.setAutoCommit(false);
-                CompositorDao oCompositorDao = new CompositorDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), null);
-                CompositorBean oCompositorBean = new CompositorBean();
-                
-                
-                
+//                CompositorDao oCompositorDao = new CompositorDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), null);
+//                CompositorBean oCompositorBean = new CompositorBean();
+                CompositorDao oCompositorDao = new CompositorDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), where);
+                CompositorBean oCompositorBean;
+                if (requestId == 0) {
+                    oCompositorBean = new CompositorBean();
+                } else {
+                    oCompositorBean = new CompositorBean(requestId);
+                }   
                 oCompositorBean = AppConfigurationHelper.getGson().fromJson(jason, oCompositorBean.getClass());
                 if (oCompositorBean != null) {
                     Integer iResult = oCompositorDao.set(oCompositorBean);

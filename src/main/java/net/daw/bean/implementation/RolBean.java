@@ -60,10 +60,11 @@ public class RolBean implements GenericBean{
 
     @Override
     public String toPairs() {
-        String pairs;
-        pairs  = "id = " + id + ",";
-        pairs += "rol = " + EncodingUtilHelper.quotate(rol);
-        return pairs;
+        
+        String strPairs = "";
+//        pairs  = "id = " + id + ",";
+        strPairs += "rol = " + EncodingUtilHelper.quotate(rol);
+        return strPairs;
     }
 
     @Override

@@ -63,7 +63,7 @@ public class ConnectionClassHelper {
             return System.getenv("OPENSHIFT_MYSQL_DB_PASSWORD");
             //"la contraseña esta en la web de openshift";
         } else {
-            return "bitnami";
+            return "";
         }
     }
 

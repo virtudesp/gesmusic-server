@@ -44,7 +44,6 @@ public class TipoentidadBean implements GenericBean {
     @Expose
     private String inicial;
 
-
     public TipoentidadBean() {
     }
 
@@ -97,8 +96,18 @@ public class TipoentidadBean implements GenericBean {
     @Override
     public String toPairs() {
         String strPairs = "";
-        strPairs += "tipoentidad=" + EncodingUtilHelper.quotate(tipoentidad) + ",";
-        strPairs += "inicial=" + EncodingUtilHelper.quotate(inicial);
+//        pairs  = "id = " + id + ",";
+//        strPairs += "tipoentidad=" + EncodingUtilHelper.quotate(tipoentidad) + ",";
+//        strPairs += "inicial=" + EncodingUtilHelper.quotate(inicial);
+        Boolean hay = false;
+        if (tipoentidad != null) {
+            strPairs += "nombre=" + EncodingUtilHelper.quotate(tipoentidad);
+            hay = true;
+        }
+        if (inicial != null) {
+            strPairs += (hay) ? ",inicial=" : "inicial=";
+            strPairs += EncodingUtilHelper.quotate(inicial);
+        }
         return strPairs;
     }
 

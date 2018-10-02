@@ -136,8 +136,18 @@ public class CompositorBean implements GenericBean {
         strColumns += id + ",";
         strColumns += EncodingUtilHelper.quotate(nombre) + ",";
         strColumns += EncodingUtilHelper.quotate(apellidos) + ",";
-        strColumns += EncodingUtilHelper.stringifyAndQuotate(fecha_nac) + ",";
-        strColumns += EncodingUtilHelper.stringifyAndQuotate(fecha_def) + ",";
+//        strColumns += EncodingUtilHelper.stringifyAndQuotate(fecha_nac) + ",";
+//        strColumns += EncodingUtilHelper.stringifyAndQuotate(fecha_def) + ",";
+        if (fecha_nac == null) {
+            strColumns += "null" + ",";
+        } else {
+            strColumns += EncodingUtilHelper.stringifyAndQuotate(fecha_nac) + ",";
+        }
+        if (fecha_def == null) {
+            strColumns += "null" + ",";
+        } else {
+            strColumns += EncodingUtilHelper.stringifyAndQuotate(fecha_def) + ",";
+        }
         strColumns += EncodingUtilHelper.quotate(lugar_nac) + ",";
         strColumns += EncodingUtilHelper.quotate(lugar_def);
         return strColumns;
@@ -145,14 +155,43 @@ public class CompositorBean implements GenericBean {
 
     @Override
     public String toPairs() {
-        String strColumns = "";
-        strColumns += "nombre=" + EncodingUtilHelper.quotate(nombre) + ",";
-        strColumns += "apellidos=" + EncodingUtilHelper.quotate(apellidos) + ",";
-        strColumns += "fecha_nac=" + EncodingUtilHelper.stringifyAndQuotate(fecha_nac) + ",";
-        strColumns += "fecha_def=" + EncodingUtilHelper.stringifyAndQuotate(fecha_def) + ",";
-        strColumns += "lugar_nac=" + EncodingUtilHelper.quotate(lugar_nac) + ",";
-        strColumns += "lugar_def=" + EncodingUtilHelper.quotate(lugar_def);
-        return strColumns;
+        String strPairs = "";
+//        strColumns += "nombre=" + EncodingUtilHelper.quotate(nombre) + ",";
+//        strColumns += "apellidos=" + EncodingUtilHelper.quotate(apellidos) + ",";
+//        strColumns += "fecha_nac=" + EncodingUtilHelper.stringifyAndQuotate(fecha_nac) + ",";
+//        strColumns += "fecha_def=" + EncodingUtilHelper.stringifyAndQuotate(fecha_def) + ",";
+//        strColumns += "lugar_nac=" + EncodingUtilHelper.quotate(lugar_nac) + ",";
+//        strColumns += "lugar_def=" + EncodingUtilHelper.quotate(lugar_def);        
+        Boolean hay = false;
+        if (nombre != null) {
+            strPairs += "nombre=" + EncodingUtilHelper.quotate(nombre);
+            hay = true;
+        }
+        if (apellidos != null) {
+            strPairs += (hay) ? ",apellidos=" : "apellidos=";
+            strPairs += "apellidos=" + EncodingUtilHelper.quotate(apellidos);
+            hay = true;
+        }
+        if (fecha_nac != null) {
+            strPairs += (hay) ? ",fecha_nac=" : "fecha_nac=";
+            strPairs += "fecha_nac=" + EncodingUtilHelper.stringifyAndQuotate(fecha_nac);
+            hay = true;
+        }
+        if (fecha_def != null) {
+            strPairs += (hay) ? ",fecha_def=" : "fecha_def=";
+            strPairs += "fecha_def=" + EncodingUtilHelper.stringifyAndQuotate(fecha_def);
+            hay = true;
+        }
+        if (lugar_nac != null) {
+            strPairs += (hay) ? ",lugar_nac=" : "lugar_nac=";
+            strPairs += "lugar_nac=" + EncodingUtilHelper.quotate(lugar_nac);
+            hay = true;
+        }
+        if (lugar_def != null) {
+            strPairs += (hay) ? ",lugar_def=" : "lugar_def=";
+            strPairs += "lugar_def=" + EncodingUtilHelper.quotate(lugar_def);
+        }
+        return strPairs;
     }
 
     @Override

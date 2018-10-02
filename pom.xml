@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>net.daw</groupId>
-    <artifactId>sisane-server</artifactId>
+    <artifactId>gesmusic-server</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>war</packaging>
 

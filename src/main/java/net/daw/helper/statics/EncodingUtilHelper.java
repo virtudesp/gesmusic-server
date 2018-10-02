@@ -98,7 +98,7 @@ public class EncodingUtilHelper {
     public static String quotate(String s) {
         return "\"" + s + "\"";
     }
-
+    
     public static String stringifyAndQuotate(Date s) {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm");
         String value = format.format(s);

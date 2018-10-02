@@ -18,9 +18,9 @@ public class ActoBean implements GenericBean {
     @Expose
     private Integer id = 0;
     @Expose
-    private String nombre_general;
+    private String nombre;
     @Expose
-    private String nombre_particular;
+    private String parte;
     @Expose
     private String lugar;
     @Expose
@@ -41,20 +41,20 @@ public class ActoBean implements GenericBean {
         this.id = id;
     }
 
-    public String getNombre_general() {
-        return nombre_general;
+    public String getNombre() {
+        return nombre;
     }
 
-    public void setNombre_general(String nombre_general) {
-        this.nombre_general = nombre_general;
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
     }
 
-    public String getNombre_particular() {
-        return nombre_particular;
+    public String getParte() {
+        return parte;
     }
 
-    public void setNombre_particular(String nombre_particular) {
-        this.nombre_particular = nombre_particular;
+    public void setParte(String parte) {
+        this.parte = parte;
     }
 
     public String getLugar() {
@@ -78,10 +78,10 @@ public class ActoBean implements GenericBean {
     public String getColumns() {
         String strColumns = "";
         strColumns += "id,";
-        strColumns += "nombre_general,";
-        strColumns += "nombre_particular,";
-        strColumns += "fecha,";
-        strColumns += "lugar";
+        strColumns += "nombre,";
+        strColumns += "parte,";
+        strColumns += "lugar,";
+        strColumns += "fecha";
         return strColumns;
     }
 
@@ -89,28 +89,52 @@ public class ActoBean implements GenericBean {
     public String getValues() {
         String strColumns = "";
         strColumns += id + ",";
-        strColumns += EncodingUtilHelper.quotate(getNombre_general()) + ",";
-        strColumns += EncodingUtilHelper.quotate(getNombre_particular()) + ",";
+        strColumns += EncodingUtilHelper.quotate(getNombre()) + ",";
+        strColumns += EncodingUtilHelper.quotate(getParte()) + ",";
         strColumns += EncodingUtilHelper.quotate(getLugar()) + ",";
-        strColumns += EncodingUtilHelper.stringifyAndQuotate(fecha);
+        //strColumns += EncodingUtilHelper.stringifyAndQuotate(fecha);
+        if (fecha == null) {
+            strColumns += "null";
+        } else {
+            strColumns += EncodingUtilHelper.stringifyAndQuotate(fecha);
+        }
         return strColumns;
     }
 
     @Override
     public String toPairs() {
-        String strPairs = "";
-        strPairs += "nombre_general=" + EncodingUtilHelper.quotate(getNombre_general()) + ",";
-        strPairs += "nombre_particular=" + EncodingUtilHelper.quotate(getNombre_particular()) + ",";
-        strPairs += "lugar=" + EncodingUtilHelper.quotate(getLugar()) + ",";
-        strPairs += "fecha=" + EncodingUtilHelper.stringifyAndQuotate(fecha);
+        String strPairs = "";        
+//        strPairs += "nombre=" + EncodingUtilHelper.quotate(getnombre()) + ",";
+//        strPairs += "parte=" + EncodingUtilHelper.quotate(getparte()) + ",";
+//        strPairs += "lugar=" + EncodingUtilHelper.quotate(getLugar()) + ",";
+//        strPairs += "fecha=" + EncodingUtilHelper.stringifyAndQuotate(fecha);
+        Boolean hay = false;
+        if (nombre != null) {
+            strPairs += "nombre=" + EncodingUtilHelper.quotate(nombre);
+            hay = true;
+        }
+        if (parte != null) {
+            strPairs += (hay) ? ",parte=" : "parte=";
+            strPairs += EncodingUtilHelper.quotate(parte);
+            hay = true;
+        }
+        if (lugar != null) {
+            strPairs += (hay) ? ",lugar=" : "lugar=";
+            strPairs += EncodingUtilHelper.quotate(lugar);
+            hay = true;
+        }
+        if (fecha != null) {
+            strPairs += (hay) ? ",fecha=" : "fecha=";
+            strPairs += EncodingUtilHelper.stringifyAndQuotate(fecha);
+        }
         return strPairs;
     }
 
     @Override
     public ActoBean fill(ResultSet oResultSet, Connection pooledConnection, PusuarioBean oPuserBean_security, Integer expand) throws SQLException, Exception {
         this.setId(oResultSet.getInt("id"));
-        this.setNombre_general(oResultSet.getString("nombre_general"));
-        this.setNombre_particular(oResultSet.getString("nombre_particular"));
+        this.setNombre(oResultSet.getString("nombre"));
+        this.setParte(oResultSet.getString("parte"));
         this.setLugar(oResultSet.getString("lugar"));
         this.setFecha(oResultSet.getDate("fecha"));
 

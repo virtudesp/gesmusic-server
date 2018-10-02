@@ -28,6 +28,8 @@
  */
 package net.daw.service.implementation;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -226,6 +228,23 @@ public class SociedadService implements TableServiceInterface, ViewServiceInterf
     public ReplyBean set() throws Exception {
         if (this.checkpermission("set")) {
             String jason = ParameterCook.prepareJson(oRequest);
+            // Se necesita el id para diferenciar un insert de un update enviando como parámetro where al crear oEntidadBean 
+            JsonParser parser = new JsonParser();
+            JsonElement elementObject = parser.parse(jason);
+            String strRequestId;
+            try{
+                strRequestId = elementObject.getAsJsonObject().get("id").getAsString();
+            } catch (Exception e){
+                strRequestId = "0";
+            }
+            Integer requestId = Integer.parseInt(strRequestId);
+            String where = "";
+            if (requestId == 0) {
+                where = null;
+            } else {
+                where += " where id=" + requestId;
+            }
+            // hasta aquí lo que he añadido yo
             ReplyBean oReplyBean = new ReplyBean();
             Connection oConnection = null;
             ConnectionInterface oDataConnectionSource = null;
@@ -233,8 +252,15 @@ public class SociedadService implements TableServiceInterface, ViewServiceInterf
                 oDataConnectionSource = getSourceConnection();
                 oConnection = oDataConnectionSource.newConnection();
                 oConnection.setAutoCommit(false);
-                SociedadDao oSociedadDao = new SociedadDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), null);
-                SociedadBean oSociedadBean = new SociedadBean();
+//                SociedadDao oSociedadDao = new SociedadDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), null);
+//                SociedadBean oSociedadBean = new SociedadBean();
+                SociedadDao oSociedadDao = new SociedadDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), where);
+                SociedadBean oSociedadBean;
+                if (requestId == 0) {
+                    oSociedadBean = new SociedadBean();
+                } else {
+                    oSociedadBean = new SociedadBean(requestId);
+                }
                 oSociedadBean = AppConfigurationHelper.getGson().fromJson(jason, oSociedadBean.getClass());
                 if (oSociedadBean != null) {
                     Integer iResult = oSociedadDao.set(oSociedadBean);

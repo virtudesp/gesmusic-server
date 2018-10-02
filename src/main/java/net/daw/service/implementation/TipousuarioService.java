@@ -29,6 +29,8 @@
 package net.daw.service.implementation;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -37,7 +39,6 @@ import javax.servlet.http.HttpServletRequest;
 import net.daw.bean.implementation.PusuarioBean;
 import net.daw.bean.implementation.TipousuarioBean;
 import net.daw.bean.implementation.ReplyBean;
-import net.daw.bean.implementation.UsuarioBean;
 import net.daw.connection.publicinterface.ConnectionInterface;
 import net.daw.dao.implementation.TipousuarioDao;
 import net.daw.helper.statics.AppConfigurationHelper;
@@ -229,6 +230,23 @@ public class TipousuarioService implements TableServiceInterface, ViewServiceInt
     public ReplyBean set() throws Exception {
         if (this.checkpermission("set")) {
             String jason = ParameterCook.prepareJson(oRequest);
+            // Se necesita el id para diferenciar un insert de un update enviando como parámetro where al crear oEntidadBean 
+            JsonParser parser = new JsonParser();
+            JsonElement elementObject = parser.parse(jason);
+            String strRequestId;
+            try{
+                strRequestId = elementObject.getAsJsonObject().get("id").getAsString();
+            } catch (Exception e){
+                strRequestId = "0";
+            }
+            Integer requestId = Integer.parseInt(strRequestId);
+            String where = "";
+            if (requestId == 0) {
+                where = null;
+            } else {
+                where += " where id=" + requestId;
+            }
+            // hasta aquí lo que he añadido yo
             ReplyBean oReplyBean = new ReplyBean();
             Connection oConnection = null;
             ConnectionInterface oDataConnectionSource = null;
@@ -236,8 +254,15 @@ public class TipousuarioService implements TableServiceInterface, ViewServiceInt
                 oDataConnectionSource = getSourceConnection();
                 oConnection = oDataConnectionSource.newConnection();
                 oConnection.setAutoCommit(false);
-                TipousuarioDao oUsertypeDao = new TipousuarioDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), null);
-                TipousuarioBean oUsertypeBean = new TipousuarioBean();
+//                TipousuarioDao oUsertypeDao = new TipousuarioDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), null);
+//                TipousuarioBean oUsertypeBean = new TipousuarioBean();
+                TipousuarioDao oUsertypeDao = new TipousuarioDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), where);
+                TipousuarioBean oUsertypeBean;
+                if (requestId == 0) {
+                    oUsertypeBean = new TipousuarioBean();
+                } else {
+                    oUsertypeBean = new TipousuarioBean(requestId);
+                }
                 oUsertypeBean = AppConfigurationHelper.getGson().fromJson(jason, oUsertypeBean.getClass());
                 if (oUsertypeBean != null) {
                     Integer iResult = oUsertypeDao.set(oUsertypeBean);

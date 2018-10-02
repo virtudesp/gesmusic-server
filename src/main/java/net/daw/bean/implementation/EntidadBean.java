@@ -52,14 +52,13 @@ public class EntidadBean implements GenericBean {
 
     @Expose(serialize = false)
     private Integer id_sociedad = 0;
-   @Expose(deserialize = false)
+    @Expose(deserialize = false)
     private SociedadBean obj_sociedad = null;
 
     @Expose(serialize = false)
     private Integer id_tipoentidad = 0;
-   @Expose(deserialize = false)
+    @Expose(deserialize = false)
     private TipoentidadBean obj_tipoentidad = null;
-
 
     public EntidadBean() {
     }
@@ -74,7 +73,7 @@ public class EntidadBean implements GenericBean {
 
     public void setId(Integer id) {
         this.id = id;
-    }   
+    }
 
     public String getNumero() {
         return numero;
@@ -210,7 +209,7 @@ public class EntidadBean implements GenericBean {
 
     public void setObj_sociedad(SociedadBean obj_sociedad) {
         this.obj_sociedad = obj_sociedad;
-    } 
+    }
 
     public Integer getId_tipoentidad() {
         return id_tipoentidad;
@@ -269,8 +268,17 @@ public class EntidadBean implements GenericBean {
         strColumns += EncodingUtilHelper.quotate(getMovil()) + ",";
         strColumns += EncodingUtilHelper.quotate(getEmail()) + ",";
         strColumns += EncodingUtilHelper.quotate(getWeb()) + ",";
-        strColumns += EncodingUtilHelper.stringifyAndQuotate(fecha_alta) + ",";
-        strColumns += EncodingUtilHelper.stringifyAndQuotate(fecha_baja) + ",";
+        if (fecha_alta == null) {
+            java.util.Date hoy = new Date();
+            strColumns += EncodingUtilHelper.stringifyAndQuotate(hoy) + ",";
+        } else {
+            strColumns += EncodingUtilHelper.stringifyAndQuotate(fecha_alta) + ",";
+        }
+        if (fecha_baja == null) {
+            strColumns += "null" + ",";
+        } else {
+            strColumns += EncodingUtilHelper.stringifyAndQuotate(fecha_baja) + ",";
+        }
         strColumns += getId_sociedad() + ",";
         strColumns += getId_tipoentidad();
         return strColumns;
@@ -279,23 +287,106 @@ public class EntidadBean implements GenericBean {
     @Override
     public String toPairs() {
         String strPairs = "";
-        strPairs += "numero=" + EncodingUtilHelper.quotate(numero) + ",";
-        strPairs += "nombre=" + EncodingUtilHelper.quotate(nombre) + ",";
-        strPairs += "apellidos=" + EncodingUtilHelper.quotate(apellidos) + ",";
-        strPairs += "nif=" + EncodingUtilHelper.quotate(nif) + ",";
-        strPairs += "direccion=" + EncodingUtilHelper.quotate(direccion) + ",";
-        strPairs += "codigopostal=" + EncodingUtilHelper.quotate(codigopostal) + ",";
-        strPairs += "poblacion=" + EncodingUtilHelper.quotate(poblacion) + ",";
-        strPairs += "provincia=" + EncodingUtilHelper.quotate(provincia) + ",";
-        strPairs += "pais=" + EncodingUtilHelper.quotate(pais) + ",";
-        strPairs += "telefono=" + EncodingUtilHelper.quotate(telefono) + ",";
-        strPairs += "movil=" + EncodingUtilHelper.quotate(movil) + ",";
-        strPairs += "email=" + EncodingUtilHelper.quotate(email) + ",";
-        strPairs += "web=" + EncodingUtilHelper.quotate(web) + ",";
-        strPairs += "fecha_alta=" + EncodingUtilHelper.stringifyAndQuotate(fecha_alta) + ",";
-        strPairs += "fecha_baja=" + EncodingUtilHelper.stringifyAndQuotate(fecha_baja) + ",";
-        strPairs += "id_sociedad=" + id_sociedad + ",";
-        strPairs += "id_tipoentidad=" + id_tipoentidad;
+        Boolean hay = false;
+        if (numero != null) {
+            strPairs += "numero=" + EncodingUtilHelper.quotate(numero);
+            hay = true;
+        }
+        if (nombre != null) {
+            strPairs += (hay) ? ",nombre=" : "nombre=";
+            strPairs += EncodingUtilHelper.quotate(nombre);
+            hay = true;
+            //strPairs += "nombre=" + EncodingUtilHelper.quotate(nombre) + ",";
+        }
+        if (apellidos != null) {
+            //strPairs += "apellidos=" + EncodingUtilHelper.quotate(apellidos) + ",";
+            strPairs += (hay) ? ",apellidos=" : "apellidos=";
+            strPairs += EncodingUtilHelper.quotate(apellidos);
+            hay = true;
+        }
+        if (nif != null) {
+            //strPairs += "nif=" + EncodingUtilHelper.quotate(nif) + ",";
+            strPairs += (hay) ? ",nif=" : "nif=";
+            strPairs += EncodingUtilHelper.quotate(nif);
+            hay = true;
+        }
+        if (direccion != null) {
+            //strPairs += "direccion=" + EncodingUtilHelper.quotate(direccion) + ",";
+            strPairs += (hay) ? ",direccion=" : "direccion=";
+            strPairs += EncodingUtilHelper.quotate(direccion);
+            hay = true;
+        }
+        if (codigopostal != null) {
+            //strPairs += "codigopostal=" + EncodingUtilHelper.quotate(codigopostal) + ",";
+            strPairs += (hay) ? ",codigopostal=" : "codigopostal=";
+            strPairs += EncodingUtilHelper.quotate(codigopostal);
+            hay = true;
+        }
+        if (poblacion != null) {
+            //strPairs += "poblacion=" + EncodingUtilHelper.quotate(poblacion) + ",";
+            strPairs += (hay) ? ",poblacion=" : "poblacion=";
+            strPairs += EncodingUtilHelper.quotate(poblacion);
+            hay = true;
+        }
+        if (provincia != null) {
+            //strPairs += "provincia=" + EncodingUtilHelper.quotate(provincia) + ",";
+            strPairs += (hay) ? ",provincia=" : "provincia=";
+            strPairs += EncodingUtilHelper.quotate(provincia);
+            hay = true;
+        }
+        if (pais != null) {
+            //strPairs += "pais=" + EncodingUtilHelper.quotate(pais) + ",";
+            strPairs += (hay) ? ",pais=" : "pais=";
+            strPairs += EncodingUtilHelper.quotate(pais);
+            hay = true;
+        }
+        if (telefono != null) {
+            //strPairs += "telefono=" + EncodingUtilHelper.quotate(telefono) + ",";
+            strPairs += (hay) ? ",telefono=" : "telefono=";
+            strPairs += EncodingUtilHelper.quotate(telefono);
+            hay = true;
+        }
+        if (movil != null) {
+            //strPairs += "movil=" + EncodingUtilHelper.quotate(movil) + ",";
+            strPairs += (hay) ? ",movil=" : "movil=";
+            strPairs += EncodingUtilHelper.quotate(movil);
+            hay = true;
+        }
+        if (email != null) {
+            //strPairs += "email=" + EncodingUtilHelper.quotate(email) + ",";
+            strPairs += (hay) ? ",email=" : "email=";
+            strPairs += EncodingUtilHelper.quotate(email);
+            hay = true;
+        }
+        if (web != null) {
+            //strPairs += "web=" + EncodingUtilHelper.quotate(web) + ",";
+            strPairs += (hay) ? ",web=" : "web=";
+            strPairs += EncodingUtilHelper.quotate(web);
+            hay = true;
+        }
+        if (fecha_alta != null) {
+            //strPairs += "fecha_alta=" + EncodingUtilHelper.stringifyAndQuotate(fecha_alta) + ",";
+            strPairs += (hay) ? ",fecha_alta=" : "fecha_alta=";
+            strPairs += EncodingUtilHelper.stringifyAndQuotate(fecha_alta);
+            hay = true;
+        }
+        if (fecha_baja != null) {
+            //strPairs += "fecha_baja=" + EncodingUtilHelper.stringifyAndQuotate(fecha_baja) + ",";
+            strPairs += (hay) ? ",fecha_baja=" : "fecha_baja=";
+            strPairs += EncodingUtilHelper.stringifyAndQuotate(fecha_baja);
+            hay = true;
+        }
+        if (id_sociedad != 0) {
+            //strPairs += "id_sociedad=" + id_sociedad + ",";
+            strPairs += (hay) ? ",id_sociedad=" : "id_sociedad=";
+            strPairs += id_sociedad;
+            hay = true;
+        }
+        if (id_tipoentidad != 0) {
+            //strPairs += "id_tipoentidad=" + id_tipoentidad;
+            strPairs += (hay) ? ",id_tipoentidad=" : "id_tipoentidad=";
+            strPairs += id_tipoentidad;
+        }    
         return strPairs;
     }
 

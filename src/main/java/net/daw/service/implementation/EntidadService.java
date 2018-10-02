@@ -28,6 +28,10 @@
  */
 package net.daw.service.implementation;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -40,6 +44,7 @@ import net.daw.connection.publicinterface.ConnectionInterface;
 import net.daw.dao.implementation.EntidadDao;
 import net.daw.helper.statics.AppConfigurationHelper;
 import static net.daw.helper.statics.AppConfigurationHelper.getSourceConnection;
+import net.daw.helper.statics.EncodingUtilHelper;
 import net.daw.helper.statics.FilterBeanHelper;
 import net.daw.helper.statics.JsonMessage;
 import net.daw.helper.statics.Log4j;
@@ -226,6 +231,22 @@ public class EntidadService implements TableServiceInterface, ViewServiceInterfa
     public ReplyBean set() throws Exception {
         if (this.checkpermission("set")) {
             String jason = ParameterCook.prepareJson(oRequest);
+            // Se necesita el id para diferenciar un insert de un update enviando como parámetro where al crear oEntidadBean 
+            JsonParser parser = new JsonParser();
+            JsonElement elementObject = parser.parse(jason);
+            String strRequestId;
+            try{
+                strRequestId = elementObject.getAsJsonObject().get("id").getAsString();
+            } catch (Exception e){
+                strRequestId = "0";
+            }
+            Integer requestId = Integer.parseInt(strRequestId);
+            String where = "";
+            if (requestId == 0) {
+                where = null;
+            } else {
+                where += " where id=" + requestId;
+            }
             ReplyBean oReplyBean = new ReplyBean();
             Connection oConnection = null;
             ConnectionInterface oDataConnectionSource = null;
@@ -233,8 +254,15 @@ public class EntidadService implements TableServiceInterface, ViewServiceInterfa
                 oDataConnectionSource = getSourceConnection();
                 oConnection = oDataConnectionSource.newConnection();
                 oConnection.setAutoCommit(false);
-                EntidadDao oEntidadDao = new EntidadDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), null);
-                EntidadBean oEntidadBean = new EntidadBean();
+                EntidadDao oEntidadDao = new EntidadDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), where);
+                //EntidadDao oEntidadDao = new EntidadDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), null);
+                EntidadBean oEntidadBean;
+                if (requestId == 0) {
+                    oEntidadBean = new EntidadBean();
+                } else {
+                    oEntidadBean = new EntidadBean(requestId);
+                }
+                //EntidadBean oEntidadBean = new EntidadBean();
                 oEntidadBean = AppConfigurationHelper.getGson().fromJson(jason, oEntidadBean.getClass());
                 if (oEntidadBean != null) {
                     Integer iResult = oEntidadDao.set(oEntidadBean);

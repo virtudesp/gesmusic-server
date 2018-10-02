@@ -132,10 +132,29 @@ public class ObraBean implements GenericBean {
     @Override
     public String toPairs() {
         String strPairs = "";
-        strPairs += "titulo=" + EncodingUtilHelper.quotate(titulo) + ",";
-        strPairs += "subtitulo=" + EncodingUtilHelper.quotate(subtitulo) + ",";
-        strPairs += "notas=" + EncodingUtilHelper.quotate(notas) + ",";
-        strPairs += "id_compositor=" + id_compositor;
+//        strPairs += "titulo=" + EncodingUtilHelper.quotate(titulo) + ",";
+//        strPairs += "subtitulo=" + EncodingUtilHelper.quotate(subtitulo) + ",";
+//        strPairs += "notas=" + EncodingUtilHelper.quotate(notas) + ",";
+//        strPairs += "id_compositor=" + id_compositor;
+        Boolean hay = false;
+        if (titulo != null) {
+            strPairs += "titulo=" + EncodingUtilHelper.quotate(titulo);
+            hay = true;
+        }
+        if (subtitulo != null) {
+            strPairs += (hay) ? ",subtitulo=" : "subtitulo=";
+            strPairs += EncodingUtilHelper.quotate(subtitulo);
+            hay = true;
+        }
+        if (notas != null) {
+            strPairs += (hay) ? ",notas=" : "notas=";
+            strPairs += EncodingUtilHelper.quotate(notas);
+            hay = true;
+        }
+        if (id_compositor != 0) {
+            strPairs += (hay) ? ",id_compositor=" : "id_compositor=";
+            strPairs += id_compositor;
+        }
         return strPairs;
     }
 

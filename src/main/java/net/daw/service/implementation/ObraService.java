@@ -29,6 +29,8 @@
 package net.daw.service.implementation;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -227,7 +229,24 @@ public class ObraService implements TableServiceInterface, ViewServiceInterface 
     @Override
     public ReplyBean set() throws Exception {
         if (this.checkpermission("set")) {
-            String jason = ParameterCook.prepareJson(oRequest);
+            String jason = ParameterCook.prepareJson(oRequest);            
+            // Se necesita el id para diferenciar un insert de un update enviando como parámetro where al crear oEntidadBean 
+            JsonParser parser = new JsonParser();
+            JsonElement elementObject = parser.parse(jason);
+            String strRequestId;
+            try{
+                strRequestId = elementObject.getAsJsonObject().get("id").getAsString();
+            } catch (Exception e){
+                strRequestId = "0";
+            }
+            Integer requestId = Integer.parseInt(strRequestId);
+            String where = "";
+            if (requestId == 0) {
+                where = null;
+            } else {
+                where += " where id=" + requestId;
+            }
+            // hasta aquí lo que he añadido yo
             ReplyBean oReplyBean = new ReplyBean();
             Connection oConnection = null;
             ConnectionInterface oDataConnectionSource = null;
@@ -235,8 +254,15 @@ public class ObraService implements TableServiceInterface, ViewServiceInterface 
                 oDataConnectionSource = getSourceConnection();
                 oConnection = oDataConnectionSource.newConnection();
                 oConnection.setAutoCommit(false);
-                ObraDao oObraDao = new ObraDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), null);
-                ObraBean oObraBean = new ObraBean();
+//                ObraDao oObraDao = new ObraDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), null);
+//                ObraBean oObraBean = new ObraBean();
+                ObraDao oObraDao = new ObraDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), where);
+                ObraBean oObraBean;
+                if (requestId == 0) {
+                    oObraBean = new ObraBean();
+                } else {
+                    oObraBean = new ObraBean(requestId);
+                }
                 oObraBean = AppConfigurationHelper.getGson().fromJson(jason, oObraBean.getClass());
                 if (oObraBean != null) {
                     Integer iResult = oObraDao.set(oObraBean);
@@ -245,11 +271,11 @@ public class ObraService implements TableServiceInterface, ViewServiceInterface 
                         oReplyBean.setJson(JsonMessage.getJsonExpression(200, iResult.toString()));
                     } else {
                         oReplyBean.setCode(500);
-                        oReplyBean.setJson(JsonMessage.getJsonMsg(500, "Error during registry set"));
+                        oReplyBean.setJson(JsonMessage.getJsonMsg(500, "Error during registry set1"));
                     }
                 } else {
                     oReplyBean.setCode(500);
-                    oReplyBean.setJson(JsonMessage.getJsonMsg(500, "Error during registry set"));
+                    oReplyBean.setJson(JsonMessage.getJsonMsg(500, "Error during registry set2"));
                 }
                 oConnection.commit();
             } catch (Exception ex) {

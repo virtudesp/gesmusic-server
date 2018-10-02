@@ -29,6 +29,8 @@
 package net.daw.service.implementation;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -231,6 +233,23 @@ public class UsuarioService implements TableServiceInterface, ViewServiceInterfa
     public ReplyBean set() throws Exception {
         if (this.checkpermission("set")) {
             String jason = ParameterCook.prepareJson(oRequest);
+            // Se necesita el id para diferenciar un insert de un update enviando como parámetro where al crear oEntidadBean 
+            JsonParser parser = new JsonParser();
+            JsonElement elementObject = parser.parse(jason);
+            String strRequestId;
+            try{
+                strRequestId = elementObject.getAsJsonObject().get("id").getAsString();
+            } catch (Exception e){
+                strRequestId = "0";
+            }
+            Integer requestId = Integer.parseInt(strRequestId);
+            String where = "";
+            if (requestId == 0) {
+                where = null;
+            } else {
+                where += " where id=" + requestId;
+            }
+            // hasta aquí lo que he añadido yo
             ReplyBean oReplyBean = new ReplyBean();
             Connection oConnection = null;
             ConnectionInterface oDataConnectionSource = null;
@@ -238,8 +257,15 @@ public class UsuarioService implements TableServiceInterface, ViewServiceInterfa
                 oDataConnectionSource = getSourceConnection();
                 oConnection = oDataConnectionSource.newConnection();
                 oConnection.setAutoCommit(false);
-                UsuarioDao oUserDao = new UsuarioDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), null);
-                UsuarioBean oUserBean = new UsuarioBean();
+//                UsuarioDao oUserDao = new UsuarioDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), null);
+//                UsuarioBean oUserBean = new UsuarioBean();
+                UsuarioDao oUserDao = new UsuarioDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), where);
+                UsuarioBean oUserBean;
+                if (requestId == 0) {
+                    oUserBean = new UsuarioBean();
+                } else {
+                    oUserBean = new UsuarioBean(requestId);
+                }
                 oUserBean = AppConfigurationHelper.getGson().fromJson(jason, oUserBean.getClass());
                 if (oUserBean != null) {
                     Integer iResult = oUserDao.set(oUserBean);

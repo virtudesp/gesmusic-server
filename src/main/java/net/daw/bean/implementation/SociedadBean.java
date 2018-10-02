@@ -182,17 +182,71 @@ public class SociedadBean implements GenericBean {
     @Override
     public String toPairs() {
         String strPairs = "";
-        strPairs += "nombre=" + EncodingUtilHelper.quotate(nombre) + ",";
-        strPairs += "razon_social=" + EncodingUtilHelper.quotate(razon_social) + ",";
-        strPairs += "nif=" + EncodingUtilHelper.quotate(nif) + ",";
-        strPairs += "direccion=" + EncodingUtilHelper.quotate(direccion) + ",";
-        strPairs += "poblacion=" + EncodingUtilHelper.quotate(poblacion) + ",";
-        strPairs += "provincia=" + EncodingUtilHelper.quotate(provincia) + ",";
-        strPairs += "provincia=" + EncodingUtilHelper.quotate(pais) + ",";
-        strPairs += "codigopostal=" + EncodingUtilHelper.quotate(codigopostal) + ",";
-        strPairs += "telefono=" + EncodingUtilHelper.quotate(telefono) + ",";
-        strPairs += "email=" + EncodingUtilHelper.quotate(email) + ",";
-        strPairs += "web=" + EncodingUtilHelper.quotate(web);
+//        strPairs += "nombre=" + EncodingUtilHelper.quotate(nombre) + ",";
+//        strPairs += "razon_social=" + EncodingUtilHelper.quotate(razon_social) + ",";
+//        strPairs += "nif=" + EncodingUtilHelper.quotate(nif) + ",";
+//        strPairs += "direccion=" + EncodingUtilHelper.quotate(direccion) + ",";
+//        strPairs += "poblacion=" + EncodingUtilHelper.quotate(poblacion) + ",";
+//        strPairs += "provincia=" + EncodingUtilHelper.quotate(provincia) + ",";
+//        strPairs += "provincia=" + EncodingUtilHelper.quotate(pais) + ",";
+//        strPairs += "codigopostal=" + EncodingUtilHelper.quotate(codigopostal) + ",";
+//        strPairs += "telefono=" + EncodingUtilHelper.quotate(telefono) + ",";
+//        strPairs += "email=" + EncodingUtilHelper.quotate(email) + ",";
+//        strPairs += "web=" + EncodingUtilHelper.quotate(web);
+        Boolean hay = false;
+        if (nombre != null) {
+            strPairs += "nombre=" + EncodingUtilHelper.quotate(nombre);
+            hay = true;
+        }
+        if (razon_social != null) {
+            strPairs += (hay) ? ",razon_social=" : "razon_social=";
+            strPairs += EncodingUtilHelper.quotate(razon_social);
+            hay = true;
+        }
+        if (nif != null) {
+            strPairs += (hay) ? ",nif=" : "nif=";
+            strPairs += EncodingUtilHelper.quotate(nif);
+            hay = true;
+        }
+        if (direccion != null) {
+            strPairs += (hay) ? ",direccion=" : "direccion=";
+            strPairs += EncodingUtilHelper.quotate(direccion);
+            hay = true;
+        }
+        if (poblacion != null) {
+            strPairs += (hay) ? ",poblacion=" : "poblacion=";
+            strPairs += EncodingUtilHelper.quotate(poblacion);
+            hay = true;
+        }
+        if (provincia != null) {
+            strPairs += (hay) ? ",provincia=" : "provincia=";
+            strPairs += EncodingUtilHelper.quotate(provincia);
+            hay = true;
+        }
+        if (pais != null) {
+            strPairs += (hay) ? ",pais=" : "pais=";
+            strPairs += EncodingUtilHelper.quotate(pais);
+            hay = true;
+        }
+        if (codigopostal != null) {
+            strPairs += (hay) ? ",codigopostal=" : "codigopostal=";
+            strPairs += EncodingUtilHelper.quotate(codigopostal);
+            hay = true;
+        }
+        if (telefono != null) {
+            strPairs += (hay) ? ",telefono=" : "telefono=";
+            strPairs += EncodingUtilHelper.quotate(telefono);
+            hay = true;
+        }
+        if (email != null) {
+            strPairs += (hay) ? ",email=" : "email=";
+            strPairs += EncodingUtilHelper.quotate(email);
+            hay = true;
+        }
+        if (web != null) {
+            strPairs += (hay) ? ",web=" : "web=";
+            strPairs += EncodingUtilHelper.quotate(web);
+        }
         return strPairs;
     }
 

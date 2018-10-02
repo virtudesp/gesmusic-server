@@ -59,15 +59,14 @@ public class AgrupacionBean implements GenericBean{
 
     @Override
     public String toPairs() {
-        String pairs;
-        pairs  = "id = " + id + ",";
-        pairs += "agrupacion = " + EncodingUtilHelper.quotate(agrupacion);
-        return pairs;
+        String strPairs = "";
+        //pairs  = "id = " + id + ",";
+        strPairs += "agrupacion = " + EncodingUtilHelper.quotate(agrupacion);
+        return strPairs;
     }
 
     @Override
     public AgrupacionBean fill(ResultSet oResultSet, Connection pooledConnection, PusuarioBean oPuserBean_security, Integer expand) throws SQLException, Exception {
-        
         this.id = oResultSet.getInt("id");
         this.agrupacion = oResultSet.getString("agrupacion");
         
