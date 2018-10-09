@@ -28,9 +28,7 @@
  */
 package net.daw.service.implementation;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import java.sql.Connection;
 import java.util.ArrayList;
@@ -44,7 +42,6 @@ import net.daw.connection.publicinterface.ConnectionInterface;
 import net.daw.dao.implementation.EntidadDao;
 import net.daw.helper.statics.AppConfigurationHelper;
 import static net.daw.helper.statics.AppConfigurationHelper.getSourceConnection;
-import net.daw.helper.statics.EncodingUtilHelper;
 import net.daw.helper.statics.FilterBeanHelper;
 import net.daw.helper.statics.JsonMessage;
 import net.daw.helper.statics.Log4j;

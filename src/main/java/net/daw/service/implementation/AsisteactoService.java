@@ -36,11 +36,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
-import net.daw.bean.implementation.RepertorioBean;
+import net.daw.bean.implementation.AsisteactoBean;
 import net.daw.bean.implementation.ReplyBean;
 import net.daw.bean.implementation.PusuarioBean;
 import net.daw.connection.publicinterface.ConnectionInterface;
-import net.daw.dao.implementation.RepertorioDao;
+import net.daw.dao.implementation.AsisteactoDao;
 import net.daw.helper.statics.AppConfigurationHelper;
 import static net.daw.helper.statics.AppConfigurationHelper.getSourceConnection;
 import net.daw.helper.statics.FilterBeanHelper;
@@ -50,11 +50,11 @@ import net.daw.helper.statics.ParameterCook;
 import net.daw.service.publicinterface.TableServiceInterface;
 import net.daw.service.publicinterface.ViewServiceInterface;
 
-public class RepertorioService implements TableServiceInterface, ViewServiceInterface {
+public class AsisteactoService implements TableServiceInterface, ViewServiceInterface {
 
     protected HttpServletRequest oRequest = null;
 
-    public RepertorioService(HttpServletRequest request) {
+    public AsisteactoService(HttpServletRequest request) {
         oRequest = request;
     }
 
@@ -77,8 +77,8 @@ public class RepertorioService implements TableServiceInterface, ViewServiceInte
             try {
                 oDataConnectionSource = getSourceConnection();
                 oConnection = oDataConnectionSource.newConnection();
-                RepertorioDao oRepertorioDao = new RepertorioDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), null);
-                data = JsonMessage.getJsonExpression(200, Long.toString(oRepertorioDao.getCount(alFilter)));
+                AsisteactoDao oAsisteactoDao = new AsisteactoDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), null);
+                data = JsonMessage.getJsonExpression(200, Long.toString(oAsisteactoDao.getCount(alFilter)));
             } catch (Exception ex) {
                 Log4j.errorLog(this.getClass().getName() + ":" + (ex.getStackTrace()[0]).getMethodName(), ex);
                 throw new Exception();
@@ -106,11 +106,11 @@ public class RepertorioService implements TableServiceInterface, ViewServiceInte
             try {
                 oDataConnectionSource = getSourceConnection();
                 oConnection = oDataConnectionSource.newConnection();
-                RepertorioDao oRepertorioDao = new RepertorioDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), null);
-                RepertorioBean oRepertorioBean = new RepertorioBean(id);
-                oRepertorioBean = oRepertorioDao.get(oRepertorioBean, AppConfigurationHelper.getJsonMsgDepth());
+                AsisteactoDao oAsisteactoDao = new AsisteactoDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), null);
+                AsisteactoBean oAsisteactoBean = new AsisteactoBean(id);
+                oAsisteactoBean = oAsisteactoDao.get(oAsisteactoBean, AppConfigurationHelper.getJsonMsgDepth());
                 Gson gson = AppConfigurationHelper.getGson();
-                data = JsonMessage.getJsonExpression(200, AppConfigurationHelper.getGson().toJson(oRepertorioBean));
+                data = JsonMessage.getJsonExpression(200, AppConfigurationHelper.getGson().toJson(oAsisteactoBean));
             } catch (Exception ex) {
                 Log4j.errorLog(this.getClass().getName() + ":" + (ex.getStackTrace()[0]).getMethodName(), ex);
                 throw new Exception();
@@ -139,8 +139,8 @@ public class RepertorioService implements TableServiceInterface, ViewServiceInte
             try {
                 oDataConnectionSource = getSourceConnection();
                 oConnection = oDataConnectionSource.newConnection();
-                RepertorioDao oRepertorioDao = new RepertorioDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), null);
-                ArrayList<RepertorioBean> arrBeans = oRepertorioDao.getAll(alFilter, hmOrder, AppConfigurationHelper.getJsonMsgDepth());
+                AsisteactoDao oAsisteactoDao = new AsisteactoDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), null);
+                ArrayList<AsisteactoBean> arrBeans = oAsisteactoDao.getAll(alFilter, hmOrder, AppConfigurationHelper.getJsonMsgDepth());
                 data = JsonMessage.getJsonExpression(200, AppConfigurationHelper.getGson().toJson(arrBeans));
             } catch (Exception ex) {
                 Log4j.errorLog(this.getClass().getName() + ":" + (ex.getStackTrace()[0]).getMethodName(), ex);
@@ -172,8 +172,8 @@ public class RepertorioService implements TableServiceInterface, ViewServiceInte
             try {
                 oDataConnectionSource = getSourceConnection();
                 oConnection = oDataConnectionSource.newConnection();
-                RepertorioDao oRepertorioDao = new RepertorioDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), null);
-                List<RepertorioBean> arrBeans = oRepertorioDao.getPage(intRegsPerPag, intPage, alFilter, hmOrder, AppConfigurationHelper.getJsonMsgDepth());
+                AsisteactoDao oAsisteactoDao = new AsisteactoDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), null);
+                List<AsisteactoBean> arrBeans = oAsisteactoDao.getPage(intRegsPerPag, intPage, alFilter, hmOrder, AppConfigurationHelper.getJsonMsgDepth());
                 data = JsonMessage.getJsonExpression(200, AppConfigurationHelper.getGson().toJson(arrBeans));
             } catch (Exception ex) {
                 Log4j.errorLog(this.getClass().getName() + ":" + (ex.getStackTrace()[0]).getMethodName(), ex);
@@ -203,8 +203,8 @@ public class RepertorioService implements TableServiceInterface, ViewServiceInte
                 oDataConnectionSource = getSourceConnection();
                 oConnection = oDataConnectionSource.newConnection();
                 oConnection.setAutoCommit(false);
-                RepertorioDao oRepertorioDao = new RepertorioDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), null);
-                data = JsonMessage.getJsonExpression(200, (String) oRepertorioDao.remove(id).toString());
+                AsisteactoDao oAsisteactoDao = new AsisteactoDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), null);
+                data = JsonMessage.getJsonExpression(200, (String) oAsisteactoDao.remove(id).toString());
                 oConnection.commit();
             } catch (Exception ex) {
                 if (oConnection != null) {
@@ -254,19 +254,19 @@ public class RepertorioService implements TableServiceInterface, ViewServiceInte
                 oDataConnectionSource = getSourceConnection();
                 oConnection = oDataConnectionSource.newConnection();
                 oConnection.setAutoCommit(false);
-//                RepertorioDao oRepertorioDao = new RepertorioDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), null);
-                RepertorioDao oRepertorioDao = new RepertorioDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), where);
-//                RepertorioBean oRepertorioBean = new RepertorioBean();
-                RepertorioBean oRepertorioBean;
+//                AsisteactoDao oAsisteactoDao = new AsisteactoDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), null);
+                AsisteactoDao oAsisteactoDao = new AsisteactoDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), where);
+//                AsisteactoBean oAsisteactoBean = new AsisteactoBean();
+                AsisteactoBean oAsisteactoBean;
                 if (requestId == 0) {
-                    oRepertorioBean = new RepertorioBean();
+                    oAsisteactoBean = new AsisteactoBean();
                 } else {
-                    oRepertorioBean = new RepertorioBean(requestId);
+                    oAsisteactoBean = new AsisteactoBean(requestId);
                 }
                 // hasta aquí es añadido
-                oRepertorioBean = AppConfigurationHelper.getGson().fromJson(jason, oRepertorioBean.getClass());
-                if (oRepertorioBean != null) {
-                    Integer iResult = oRepertorioDao.set(oRepertorioBean);
+                oAsisteactoBean = AppConfigurationHelper.getGson().fromJson(jason, oAsisteactoBean.getClass());
+                if (oAsisteactoBean != null) {
+                    Integer iResult = oAsisteactoDao.set(oAsisteactoBean);
                     if (iResult >= 1) {
                         oReplyBean.setCode(200);
                         oReplyBean.setJson(JsonMessage.getJsonExpression(200, iResult.toString()));

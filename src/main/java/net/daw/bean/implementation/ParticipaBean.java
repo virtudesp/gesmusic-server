@@ -41,12 +41,14 @@ public class ParticipaBean implements GenericBean {
 
     @Expose
     private Integer id = 0;
+    
     @Expose(serialize = false)
-    private Integer id_agrupacion = 0;
+    private Integer id_agrupacion;
     @Expose(deserialize = false)
     private AgrupacionBean obj_agrupacion = null;
+    
     @Expose(serialize = false)
-    private Integer id_acto = 0;
+    private Integer id_acto;
     @Expose(deserialize = false)
     private ActoBean obj_acto = null;
 
@@ -119,8 +121,17 @@ public class ParticipaBean implements GenericBean {
     @Override
     public String toPairs() {
         String strPairs = "";
-        strPairs += "id_agrupacion=" + id_agrupacion + ",";
-        strPairs += "id_rol=" + id_acto;
+//        strPairs += "id_agrupacion=" + id_agrupacion + ",";
+//        strPairs += "id_acto=" + id_acto;
+        Boolean hay = false;
+        if (id_agrupacion != null) {
+            strPairs += "id_agrupacion=" + id_agrupacion;
+            hay = true;
+        }
+        if (id_acto != null) {
+            strPairs += (hay) ? ",id_acto=" : "id_acto=";
+            strPairs += id_acto;
+        }
         return strPairs;
     }
 

@@ -63,7 +63,9 @@ public class DriverManagerConnectionImpl implements ConnectionInterface {
 //http://localhost:8081/gesmusic-server/json?ob=tipousuario&op=set&json={"tipousuario":"nsnc"}
 
 //ob=entidad&op=set&json={"numero":"S00022","nombre":"Rosa","apellidos":"Uno Dos","id_sociedad":"1","id_tipoentidad":"2"}
+///http://localhost:8081/gesmusic-server/json?ob=elenco&op=set&json={"id_entidad":"1","id_agrupacion":"1","id_rol":"1"}
 
 //ob=entidad&op=set&json={"id":"64","nombre":"David"}
 
 //ob=entidad&op=remove&id=63
+//ALTER TABLE participa DROP FOREIGN KEY fk_participa_acto1;

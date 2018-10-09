@@ -36,22 +36,25 @@ import net.daw.bean.publicinterface.GenericBean;
 import net.daw.dao.implementation.AgrupacionDao;
 import net.daw.dao.implementation.EntidadDao;
 import net.daw.dao.implementation.RolDao;
-//import net.daw.helper.statics.EncodingUtilHelper;
+import net.daw.helper.statics.EncodingUtilHelper;
 
 public class ElencoBean implements GenericBean {
 
     @Expose
     private Integer id = 0;
+    
     @Expose(serialize = false)
-    private Integer id_entidad = 0;
+    private Integer id_entidad;
     @Expose(deserialize = false)
     private EntidadBean obj_entidad = null;
+    
     @Expose(serialize = false)
-    private Integer id_agrupacion = 0;
+    private Integer id_agrupacion;
     @Expose(deserialize = false)
     private AgrupacionBean obj_agrupacion = null;
+    
     @Expose(serialize = false)
-    private Integer id_rol = 0;
+    private Integer id_rol;
     @Expose(deserialize = false)
     private RolBean obj_rol = null;
 
@@ -119,13 +122,8 @@ public class ElencoBean implements GenericBean {
     }
 
     @Override
-    public String getColumns() {
-        String strColumns = "";
-        strColumns += "id,";
-        strColumns += "id_entidad,";
-        strColumns += "id_agrupacion,";
-        strColumns += "id_rol";
-        return strColumns;
+    public String getColumns() { 
+        return "id,id_entidad,id_agrupacion,id_rol";
     }
 
     @Override
@@ -141,9 +139,23 @@ public class ElencoBean implements GenericBean {
     @Override
     public String toPairs() {
         String strPairs = "";
-        strPairs += "id_entidad=" + id_entidad + ",";
-        strPairs += "id_agrupacion=" + id_agrupacion + ",";
-        strPairs += "id_rol=" + id_rol;
+//        strPairs += "id_entidad=" + id_entidad + ",";
+//        strPairs += "id_agrupacion=" + id_agrupacion + ",";
+//        strPairs += "id_rol=" + id_rol;
+        Boolean hay = false;
+        if (id_entidad != null) {
+            strPairs += "id_entidad=" + id_entidad;
+            hay = true;
+        }
+        if (id_agrupacion != null) {
+            strPairs += (hay) ? ",id_agrupacion=" : "id_agrupacion=";
+            strPairs += id_agrupacion;
+            hay = true;
+        }
+        if (id_rol != null) {
+            strPairs += (hay) ? ",id_rol=" : "id_rol=";
+            strPairs += id_rol;
+        }
         return strPairs;
     }
 

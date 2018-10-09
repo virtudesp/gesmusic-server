@@ -208,7 +208,7 @@ public class ActoService implements TableServiceInterface, ViewServiceInterface 
     public ReplyBean set() throws Exception {
         if (this.checkpermission("set")) {
             String jason = ParameterCook.prepareJson(oRequest);
-            // Se necesita el id para diferenciar un insert de un update enviando como parámetro where al crear oEntidadBean 
+            // Se necesita el id para diferenciar un insert de un update enviando como parámetro where al crear el objeto Bean 
             JsonParser parser = new JsonParser();
             JsonElement elementObject = parser.parse(jason);
             String strRequestId;
@@ -241,6 +241,7 @@ public class ActoService implements TableServiceInterface, ViewServiceInterface 
                 } else {
                     oActoBean = new ActoBean(requestId);
                 }
+                // hasta aquí es añadido
                 oActoBean = AppConfigurationHelper.getGson().fromJson(jason, oActoBean.getClass());
                 if (oActoBean != null) {
                     Integer iResult = oActoDao.set(oActoBean);

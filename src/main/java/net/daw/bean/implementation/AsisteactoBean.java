@@ -35,27 +35,26 @@ import java.sql.SQLException;
 import net.daw.bean.publicinterface.GenericBean;
 import net.daw.dao.implementation.ObraDao;
 import net.daw.dao.implementation.ActoDao;
-//import net.daw.helper.statics.EncodingUtilHelper;
 
-public class RepertorioBean implements GenericBean {
+public class AsisteactoBean implements GenericBean {
 
     @Expose
     private Integer id = 0;
     
     @Expose(serialize = false)
-    private Integer id_obra;
-    @Expose(deserialize = false)
-    private ObraBean obj_obra = null;
-    
-    @Expose(serialize = false)
     private Integer id_acto;
     @Expose(deserialize = false)
     private ActoBean obj_acto = null;
+    
+    @Expose(serialize = false)
+    private Integer id_elenco;
+    @Expose(deserialize = false)
+    private ObraBean obj_elenco = null;
 
-    public RepertorioBean() {
+    public AsisteactoBean() {
     }
 
-    public RepertorioBean(Integer id) {
+    public AsisteactoBean(Integer id) {
         this.id = id;
     }
 
@@ -65,22 +64,6 @@ public class RepertorioBean implements GenericBean {
 
     public void setId(Integer id) {
         this.id = id;
-    }
-
-    public Integer getId_obra() {
-        return id_obra;
-    }
-
-    public void setId_obra(Integer id_obra) {
-        this.id_obra = id_obra;
-    }
-
-    public ObraBean getObj_obra() {
-        return obj_obra;
-    }
-
-    public void setObj_obra(ObraBean obj_obra) {
-        this.obj_obra = obj_obra;
     }
 
     public Integer getId_acto() {
@@ -99,12 +82,28 @@ public class RepertorioBean implements GenericBean {
         this.obj_acto = obj_acto;
     }
 
+    public Integer getId_elenco() {
+        return id_elenco;
+    }
+
+    public void setId_elenco(Integer id_elenco) {
+        this.id_elenco = id_elenco;
+    }
+
+    public ObraBean getObj_elenco() {
+        return obj_elenco;
+    }
+
+    public void setObj_elenco(ObraBean obj_elenco) {
+        this.obj_elenco = obj_elenco;
+    }
+
 
     @Override
     public String getColumns() {
         String strColumns = "";
         strColumns += "id,";
-        strColumns += "id_obra,";
+        strColumns += "id_elenco,";
         strColumns += "id_acto";
         return strColumns;
     }
@@ -113,7 +112,7 @@ public class RepertorioBean implements GenericBean {
     public String getValues() {
         String strColumns = "";
         strColumns += id + ",";
-        strColumns += id_obra + ",";
+        strColumns += id_elenco + ",";
         strColumns += id_acto;
         return strColumns;
     }
@@ -121,11 +120,11 @@ public class RepertorioBean implements GenericBean {
     @Override
     public String toPairs() {
         String strPairs = "";
-//        strPairs += "id_obra=" + id_obra + ",";
+//        strPairs += "id_elenco=" + id_elenco + ",";
 //        strPairs += "id_acto=" + id_acto;
         Boolean hay = false;
-        if (id_obra != null) {
-            strPairs += "id_obra=" + id_obra;
+        if (id_elenco != null) {
+            strPairs += "id_elenco=" + id_elenco;
             hay = true;
         }
         if (id_acto != null) {
@@ -136,17 +135,17 @@ public class RepertorioBean implements GenericBean {
     }
 
     @Override
-    public RepertorioBean fill(ResultSet oResultSet, Connection pooledConnection, PusuarioBean oPusuarioBean_security, Integer expand) throws SQLException, Exception {
+    public AsisteactoBean fill(ResultSet oResultSet, Connection pooledConnection, PusuarioBean oPusuarioBean_security, Integer expand) throws SQLException, Exception {
         this.setId(oResultSet.getInt("id"));
 
         if (expand > 0) {
             ObraBean oObraBean = new ObraBean();
             ObraDao oObraDao = new ObraDao(pooledConnection, oPusuarioBean_security, null);
-            oObraBean.setId(oResultSet.getInt("id_obra"));
+            oObraBean.setId(oResultSet.getInt("id_elenco"));
             oObraBean = oObraDao.get(oObraBean, expand - 1);
-            this.setObj_obra(oObraBean);
+            this.setObj_elenco(oObraBean);
         } else {
-            this.setId_obra(oResultSet.getInt("id_obra"));
+            this.setId_elenco(oResultSet.getInt("id_elenco"));
         }
 
         if (expand > 0) {

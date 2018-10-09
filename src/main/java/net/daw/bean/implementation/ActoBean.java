@@ -93,6 +93,7 @@ public class ActoBean implements GenericBean {
         strColumns += EncodingUtilHelper.quotate(getParte()) + ",";
         strColumns += EncodingUtilHelper.quotate(getLugar()) + ",";
         //strColumns += EncodingUtilHelper.stringifyAndQuotate(fecha);
+        /*Hay que comprobar si la fecha es null porque si es null inserta la fecha actual del sistema*/
         if (fecha == null) {
             strColumns += "null";
         } else {

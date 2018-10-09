@@ -29,6 +29,8 @@
 package net.daw.service.implementation;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -228,6 +230,23 @@ public class ElencoService implements TableServiceInterface, ViewServiceInterfac
     public ReplyBean set() throws Exception {
         if (this.checkpermission("set")) {
             String jason = ParameterCook.prepareJson(oRequest);
+            // Se necesita el id para diferenciar un insert de un update enviando como parámetro where al crear el objeto Bean 
+            JsonParser parser = new JsonParser();
+            JsonElement elementObject = parser.parse(jason);
+            String strRequestId;
+            try{
+                strRequestId = elementObject.getAsJsonObject().get("id").getAsString();
+            } catch (Exception e){
+                strRequestId = "0";
+            }
+            Integer requestId = Integer.parseInt(strRequestId);
+            String where = "";
+            if (requestId == 0) {
+                where = null;
+            } else {
+                where += " where id=" + requestId;
+            }
+            // hasta aquí lo que he añadido yo
             ReplyBean oReplyBean = new ReplyBean();
             Connection oConnection = null;
             ConnectionInterface oDataConnectionSource = null;
@@ -235,8 +254,16 @@ public class ElencoService implements TableServiceInterface, ViewServiceInterfac
                 oDataConnectionSource = getSourceConnection();
                 oConnection = oDataConnectionSource.newConnection();
                 oConnection.setAutoCommit(false);
-                ElencoDao oElencoDao = new ElencoDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), null);
-                ElencoBean oElencoBean = new ElencoBean();
+//                ElencoDao oElencoDao = new ElencoDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), null);
+//                ElencoBean oElencoBean = new ElencoBean();
+                ElencoDao oElencoDao = new ElencoDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), where);
+                ElencoBean oElencoBean;
+                if (requestId == 0) {
+                    oElencoBean = new ElencoBean();
+                } else {
+                    oElencoBean = new ElencoBean(requestId);
+                }
+                // hasta aquí es añadido
                 oElencoBean = AppConfigurationHelper.getGson().fromJson(jason, oElencoBean.getClass());
                 if (oElencoBean != null) {
                     Integer iResult = oElencoDao.set(oElencoBean);

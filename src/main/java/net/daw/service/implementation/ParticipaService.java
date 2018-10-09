@@ -29,6 +29,8 @@
 package net.daw.service.implementation;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -228,6 +230,23 @@ public class ParticipaService implements TableServiceInterface, ViewServiceInter
     public ReplyBean set() throws Exception {
         if (this.checkpermission("set")) {
             String jason = ParameterCook.prepareJson(oRequest);
+            // Se necesita el id para diferenciar un insert de un update enviando como parámetro where al crear el objeto Bean 
+            JsonParser parser = new JsonParser();
+            JsonElement elementObject = parser.parse(jason);
+            String strRequestId;
+            try {
+                strRequestId = elementObject.getAsJsonObject().get("id").getAsString();
+            } catch (Exception e) {
+                strRequestId = "0";
+            }
+            Integer requestId = Integer.parseInt(strRequestId);
+            String where = "";
+            if (requestId == 0) {
+                where = null;
+            } else {
+                where += " where id=" + requestId;
+            }
+            // hasta aquí lo que he añadido yo
             ReplyBean oReplyBean = new ReplyBean();
             Connection oConnection = null;
             ConnectionInterface oDataConnectionSource = null;
@@ -235,8 +254,16 @@ public class ParticipaService implements TableServiceInterface, ViewServiceInter
                 oDataConnectionSource = getSourceConnection();
                 oConnection = oDataConnectionSource.newConnection();
                 oConnection.setAutoCommit(false);
-                ParticipaDao oParticipaDao = new ParticipaDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), null);
-                ParticipaBean oParticipaBean = new ParticipaBean();
+//                ParticipaDao oParticipaDao = new ParticipaDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), null);
+//                ParticipaBean oParticipaBean = new ParticipaBean();
+                ParticipaDao oParticipaDao = new ParticipaDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), where);
+                ParticipaBean oParticipaBean;
+                if (requestId == 0) {
+                    oParticipaBean = new ParticipaBean();
+                } else {
+                    oParticipaBean = new ParticipaBean(requestId);
+                }
+                // hasta aquí es añadido
                 oParticipaBean = AppConfigurationHelper.getGson().fromJson(jason, oParticipaBean.getClass());
                 if (oParticipaBean != null) {
                     Integer iResult = oParticipaDao.set(oParticipaBean);
