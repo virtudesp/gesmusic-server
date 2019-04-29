@@ -105,6 +105,36 @@ public class ObraDao implements ViewDaoInterface<ObraBean>, TableDaoInterface<Ob
         return arrUser;
     }
 
+    public ArrayList<ObraBean> getPageXCompositor(int idCompositor,int intRegsPerPag, int intPage, ArrayList<FilterBeanHelper> alFilter, HashMap<String, String> hmOrder, Integer expand) throws Exception {
+        
+        strSQL += " and id_compositor= " + idCompositor + " ";
+        
+        strSQL += SqlBuilder.buildSqlWhere(alFilter);
+        
+        strSQL += SqlBuilder.buildSqlOrder(hmOrder);
+        strSQL += SqlBuilder.buildSqlLimit(oMysql.getCount(strSQL), intRegsPerPag, intPage);
+        ArrayList<ObraBean> arrUser = new ArrayList<>();
+        ResultSet oResultSet = null;
+        try {
+            oResultSet = oMysql.getAllSQL(strSQL);
+            while (oResultSet.next()) {
+                ObraBean oUserBean = new ObraBean();
+                arrUser.add((ObraBean) oUserBean.fill(oResultSet, oConnection, oPuserSecurity, expand));
+            }
+            if (oResultSet != null) {
+                oResultSet.close();
+            }
+        } catch (Exception ex) {
+            Log4j.errorLog(this.getClass().getName() + ":" + (ex.getStackTrace()[0]).getMethodName(), ex);
+            throw new Exception();
+        } finally {
+            if (oResultSet != null) {
+                oResultSet.close();
+            }
+        }
+        return arrUser;
+    }
+
     @Override
     public ArrayList<ObraBean> getAll(ArrayList<FilterBeanHelper> alFilter, HashMap<String, String> hmOrder, Integer expand) throws Exception {
         strSQL += SqlBuilder.buildSqlWhere(alFilter);

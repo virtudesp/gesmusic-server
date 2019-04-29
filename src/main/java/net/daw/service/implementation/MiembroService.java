@@ -28,7 +28,6 @@
  */
 package net.daw.service.implementation;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import java.sql.Connection;
@@ -37,10 +36,10 @@ import java.util.HashMap;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import net.daw.bean.implementation.PusuarioBean;
-import net.daw.bean.implementation.TipoentidadBean;
+import net.daw.bean.implementation.MiembroBean;
 import net.daw.bean.implementation.ReplyBean;
 import net.daw.connection.publicinterface.ConnectionInterface;
-import net.daw.dao.implementation.TipoentidadDao;
+import net.daw.dao.implementation.MiembroDao;
 import net.daw.helper.statics.AppConfigurationHelper;
 import static net.daw.helper.statics.AppConfigurationHelper.getSourceConnection;
 import net.daw.helper.statics.FilterBeanHelper;
@@ -50,11 +49,11 @@ import net.daw.helper.statics.ParameterCook;
 import net.daw.service.publicinterface.TableServiceInterface;
 import net.daw.service.publicinterface.ViewServiceInterface;
 
-public class TipoentidadService implements TableServiceInterface, ViewServiceInterface {
+public class MiembroService implements TableServiceInterface, ViewServiceInterface {
 
     protected HttpServletRequest oRequest = null;
 
-    public TipoentidadService(HttpServletRequest request) {
+    public MiembroService(HttpServletRequest request) {
         oRequest = request;
     }
 
@@ -77,8 +76,8 @@ public class TipoentidadService implements TableServiceInterface, ViewServiceInt
             try {
                 oDataConnectionSource = getSourceConnection();
                 oConnection = oDataConnectionSource.newConnection();
-                TipoentidadDao oUsertypeDao = new TipoentidadDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), null);
-                data = JsonMessage.getJsonExpression(200, Long.toString(oUsertypeDao.getCount(alFilter)));
+                MiembroDao oMiembroDao = new MiembroDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), null);
+                data = JsonMessage.getJsonExpression(200, Long.toString(oMiembroDao.getCount(alFilter)));
             } catch (Exception ex) {
                 Log4j.errorLog(this.getClass().getName() + ":" + (ex.getStackTrace()[0]).getMethodName(), ex);
                 throw new Exception();
@@ -106,11 +105,10 @@ public class TipoentidadService implements TableServiceInterface, ViewServiceInt
             try {
                 oDataConnectionSource = getSourceConnection();
                 oConnection = oDataConnectionSource.newConnection();
-                TipoentidadDao oUsertypeDao = new TipoentidadDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), null);
-                TipoentidadBean oUsertypeBean = new TipoentidadBean(id);
-                oUsertypeBean = oUsertypeDao.get(oUsertypeBean, AppConfigurationHelper.getJsonMsgDepth());
-                Gson gson = AppConfigurationHelper.getGson();
-                data = JsonMessage.getJsonExpression(200, AppConfigurationHelper.getGson().toJson(oUsertypeBean));
+                MiembroDao oMiembroDao = new MiembroDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), null);
+                MiembroBean oMiembroBean = new MiembroBean(id);
+                oMiembroBean = oMiembroDao.get(oMiembroBean, AppConfigurationHelper.getJsonMsgDepth());
+                data = JsonMessage.getJsonExpression(200, AppConfigurationHelper.getGson().toJson(oMiembroBean));
             } catch (Exception ex) {
                 Log4j.errorLog(this.getClass().getName() + ":" + (ex.getStackTrace()[0]).getMethodName(), ex);
                 throw new Exception();
@@ -139,8 +137,8 @@ public class TipoentidadService implements TableServiceInterface, ViewServiceInt
             try {
                 oDataConnectionSource = getSourceConnection();
                 oConnection = oDataConnectionSource.newConnection();
-                TipoentidadDao oUsertypeDao = new TipoentidadDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), null);
-                ArrayList<TipoentidadBean> arrBeans = oUsertypeDao.getAll(alFilter, hmOrder, AppConfigurationHelper.getJsonMsgDepth());
+                MiembroDao oMiembroDao = new MiembroDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), null);
+                ArrayList<MiembroBean> arrBeans = oMiembroDao.getAll(alFilter, hmOrder, AppConfigurationHelper.getJsonMsgDepth());
                 data = JsonMessage.getJsonExpression(200, AppConfigurationHelper.getGson().toJson(arrBeans));
             } catch (Exception ex) {
                 Log4j.errorLog(this.getClass().getName() + ":" + (ex.getStackTrace()[0]).getMethodName(), ex);
@@ -172,8 +170,8 @@ public class TipoentidadService implements TableServiceInterface, ViewServiceInt
             try {
                 oDataConnectionSource = getSourceConnection();
                 oConnection = oDataConnectionSource.newConnection();
-                TipoentidadDao oUsertypeDao = new TipoentidadDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), null);
-                List<TipoentidadBean> arrBeans = oUsertypeDao.getPage(intRegsPerPag, intPage, alFilter, hmOrder, AppConfigurationHelper.getJsonMsgDepth());
+                MiembroDao oMiembroDao = new MiembroDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), null);
+                List<MiembroBean> arrBeans = oMiembroDao.getPage(intRegsPerPag, intPage, alFilter, hmOrder, AppConfigurationHelper.getJsonMsgDepth());
                 data = JsonMessage.getJsonExpression(200, AppConfigurationHelper.getGson().toJson(arrBeans));
             } catch (Exception ex) {
                 Log4j.errorLog(this.getClass().getName() + ":" + (ex.getStackTrace()[0]).getMethodName(), ex);
@@ -203,8 +201,8 @@ public class TipoentidadService implements TableServiceInterface, ViewServiceInt
                 oDataConnectionSource = getSourceConnection();
                 oConnection = oDataConnectionSource.newConnection();
                 oConnection.setAutoCommit(false);
-                TipoentidadDao oUsertypeDao = new TipoentidadDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), null);
-                data = JsonMessage.getJsonExpression(200, (String) oUsertypeDao.remove(id).toString());
+                MiembroDao oMiembroDao = new MiembroDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), null);
+                data = JsonMessage.getJsonExpression(200, (String) oMiembroDao.remove(id).toString());
                 oConnection.commit();
             } catch (Exception ex) {
                 if (oConnection != null) {
@@ -230,7 +228,7 @@ public class TipoentidadService implements TableServiceInterface, ViewServiceInt
     public ReplyBean set() throws Exception {
         if (this.checkpermission("set")) {
             String jason = ParameterCook.prepareJson(oRequest);
-            // Se necesita el id para diferenciar un insert de un update enviando como parámetro where al crear oEntidadBean 
+            // Se necesita el id para diferenciar un insert de un update enviando como parámetro where al crear oMiembroBean 
             JsonParser parser = new JsonParser();
             JsonElement elementObject = parser.parse(jason);
             String strRequestId;
@@ -246,7 +244,6 @@ public class TipoentidadService implements TableServiceInterface, ViewServiceInt
             } else {
                 where += " where id=" + requestId;
             }
-            // hasta aquí lo que he añadido yo
             ReplyBean oReplyBean = new ReplyBean();
             Connection oConnection = null;
             ConnectionInterface oDataConnectionSource = null;
@@ -254,18 +251,18 @@ public class TipoentidadService implements TableServiceInterface, ViewServiceInt
                 oDataConnectionSource = getSourceConnection();
                 oConnection = oDataConnectionSource.newConnection();
                 oConnection.setAutoCommit(false);
-//                TipoentidadDao oUsertypeDao = new TipoentidadDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), null);
-//                TipoentidadBean oUsertypeBean = new TipoentidadBean();
-                TipoentidadDao oUsertypeDao = new TipoentidadDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), where);
-                TipoentidadBean oUsertypeBean;
+                MiembroDao oMiembroDao = new MiembroDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), where);
+                //MiembroDao oMiembroDao = new MiembroDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), null);
+                MiembroBean oMiembroBean;
                 if (requestId == 0) {
-                    oUsertypeBean = new TipoentidadBean();
+                    oMiembroBean = new MiembroBean();
                 } else {
-                    oUsertypeBean = new TipoentidadBean(requestId);
+                    oMiembroBean = new MiembroBean(requestId);
                 }
-                oUsertypeBean = AppConfigurationHelper.getGson().fromJson(jason, oUsertypeBean.getClass());
-                if (oUsertypeBean != null) {
-                    Integer iResult = oUsertypeDao.set(oUsertypeBean);
+                //MiembroBean oMiembroBean = new MiembroBean();
+                oMiembroBean = AppConfigurationHelper.getGson().fromJson(jason, oMiembroBean.getClass());
+                if (oMiembroBean != null) {
+                    Integer iResult = oMiembroDao.set(oMiembroBean);
                     if (iResult >= 1) {
                         oReplyBean.setCode(200);
                         oReplyBean.setJson(JsonMessage.getJsonExpression(200, iResult.toString()));

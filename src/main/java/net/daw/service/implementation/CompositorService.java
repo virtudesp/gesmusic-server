@@ -230,7 +230,7 @@ public class CompositorService implements TableServiceInterface, ViewServiceInte
     public ReplyBean set() throws Exception {
         if (this.checkpermission("set")) {
             String jason = ParameterCook.prepareJson(oRequest);
-            // Se necesita el id para diferenciar un insert de un update enviando como parámetro where al crear oEntidadBean 
+            // Se necesita el id para diferenciar un insert de un update enviando como parámetro where al crear oMiembroBean 
             JsonParser parser = new JsonParser();
             JsonElement elementObject = parser.parse(jason);
             String strRequestId;

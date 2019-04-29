@@ -32,7 +32,6 @@ import com.google.gson.annotations.Expose;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Date;
 import net.daw.bean.publicinterface.GenericBean;
 import net.daw.helper.statics.EncodingUtilHelper;
 
@@ -45,13 +44,7 @@ public class CompositorBean implements GenericBean {
     @Expose
     private String apellidos;
     @Expose
-    private Date fecha_nac;
-    @Expose
-    private Date fecha_def;
-    @Expose
-    private String lugar_nac;
-    @Expose
-    private String lugar_def;
+    private String notas;
 
     public CompositorBean() {
     }
@@ -84,38 +77,13 @@ public class CompositorBean implements GenericBean {
         this.apellidos = apellidos;
     }
 
-    public Date getFecha_nac() {
-        return fecha_nac;
+    public String getNotas() {
+        return notas;
     }
 
-    public void setFecha_nac(Date fecha_nac) {
-        this.fecha_nac = fecha_nac;
+    public void setNotas(String notas) {
+        this.notas = notas;
     }
-
-    public Date getFecha_def() {
-        return fecha_def;
-    }
-
-    public void setFecha_def(Date fecha_def) {
-        this.fecha_def = fecha_def;
-    }
-
-    public String getLugar_nac() {
-        return lugar_nac;
-    }
-
-    public void setLugar_nac(String lugar_nac) {
-        this.lugar_nac = lugar_nac;
-    }
-
-    public String getLugar_def() {
-        return lugar_def;
-    }
-
-    public void setLugar_def(String lugar_def) {
-        this.lugar_def = lugar_def;
-    }
-
     
     @Override
     public String getColumns() {
@@ -123,10 +91,7 @@ public class CompositorBean implements GenericBean {
         strColumns += "id,";
         strColumns += "nombre,";
         strColumns += "apellidos,";
-        strColumns += "fecha_nac,";
-        strColumns += "fecha_def,";
-        strColumns += "lugar_nac,";
-        strColumns += "lugar_def";
+        strColumns += "notas";
         return strColumns;
     }
 
@@ -136,32 +101,13 @@ public class CompositorBean implements GenericBean {
         strColumns += id + ",";
         strColumns += EncodingUtilHelper.quotate(nombre) + ",";
         strColumns += EncodingUtilHelper.quotate(apellidos) + ",";
-//        strColumns += EncodingUtilHelper.stringifyAndQuotate(fecha_nac) + ",";
-//        strColumns += EncodingUtilHelper.stringifyAndQuotate(fecha_def) + ",";
-        if (fecha_nac == null) {
-            strColumns += "null" + ",";
-        } else {
-            strColumns += EncodingUtilHelper.stringifyAndQuotate(fecha_nac) + ",";
-        }
-        if (fecha_def == null) {
-            strColumns += "null" + ",";
-        } else {
-            strColumns += EncodingUtilHelper.stringifyAndQuotate(fecha_def) + ",";
-        }
-        strColumns += EncodingUtilHelper.quotate(lugar_nac) + ",";
-        strColumns += EncodingUtilHelper.quotate(lugar_def);
+        strColumns += EncodingUtilHelper.quotate(notas);
         return strColumns;
     }
 
     @Override
     public String toPairs() {
-        String strPairs = "";
-//        strColumns += "nombre=" + EncodingUtilHelper.quotate(nombre) + ",";
-//        strColumns += "apellidos=" + EncodingUtilHelper.quotate(apellidos) + ",";
-//        strColumns += "fecha_nac=" + EncodingUtilHelper.stringifyAndQuotate(fecha_nac) + ",";
-//        strColumns += "fecha_def=" + EncodingUtilHelper.stringifyAndQuotate(fecha_def) + ",";
-//        strColumns += "lugar_nac=" + EncodingUtilHelper.quotate(lugar_nac) + ",";
-//        strColumns += "lugar_def=" + EncodingUtilHelper.quotate(lugar_def);        
+        String strPairs = "";        
         Boolean hay = false;
         if (nombre != null) {
             strPairs += "nombre=" + EncodingUtilHelper.quotate(nombre);
@@ -169,27 +115,12 @@ public class CompositorBean implements GenericBean {
         }
         if (apellidos != null) {
             strPairs += (hay) ? ",apellidos=" : "apellidos=";
-            strPairs += "apellidos=" + EncodingUtilHelper.quotate(apellidos);
+            strPairs += EncodingUtilHelper.quotate(apellidos);
             hay = true;
         }
-        if (fecha_nac != null) {
-            strPairs += (hay) ? ",fecha_nac=" : "fecha_nac=";
-            strPairs += "fecha_nac=" + EncodingUtilHelper.stringifyAndQuotate(fecha_nac);
-            hay = true;
-        }
-        if (fecha_def != null) {
-            strPairs += (hay) ? ",fecha_def=" : "fecha_def=";
-            strPairs += "fecha_def=" + EncodingUtilHelper.stringifyAndQuotate(fecha_def);
-            hay = true;
-        }
-        if (lugar_nac != null) {
-            strPairs += (hay) ? ",lugar_nac=" : "lugar_nac=";
-            strPairs += "lugar_nac=" + EncodingUtilHelper.quotate(lugar_nac);
-            hay = true;
-        }
-        if (lugar_def != null) {
-            strPairs += (hay) ? ",lugar_def=" : "lugar_def=";
-            strPairs += "lugar_def=" + EncodingUtilHelper.quotate(lugar_def);
+        if (notas != null) {
+            strPairs += (hay) ? ",notas=" : "notas=";
+            strPairs += EncodingUtilHelper.quotate(notas);            
         }
         return strPairs;
     }
@@ -199,11 +130,7 @@ public class CompositorBean implements GenericBean {
         this.setId(oResultSet.getInt("id"));
         this.setNombre(oResultSet.getString("nombre"));
         this.setApellidos(oResultSet.getString("apellidos"));
-        this.setFecha_nac(oResultSet.getTimestamp("fecha_nac"));
-        this.setFecha_def(oResultSet.getTimestamp("fecha_def"));
-        this.setLugar_nac(oResultSet.getString("lugar_nac"));
-        this.setLugar_def(oResultSet.getString("lugar_def"));
-
+        this.setNotas(oResultSet.getString("notas"));
         return this;
     }
 

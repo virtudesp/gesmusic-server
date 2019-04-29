@@ -35,19 +35,17 @@ import java.sql.SQLException;
 import net.daw.bean.publicinterface.GenericBean;
 import net.daw.helper.statics.EncodingUtilHelper;
 
-public class TipoentidadBean implements GenericBean {
+public class TipomiembroBean implements GenericBean {
 
     @Expose
     private Integer id = 0;
     @Expose
-    private String tipoentidad;
-    @Expose
-    private String inicial;
+    private String tipomiembro;
 
-    public TipoentidadBean() {
+    public TipomiembroBean() {
     }
 
-    public TipoentidadBean(Integer id) {
+    public TipomiembroBean(Integer id) {
         this.id = id;
     }
 
@@ -59,28 +57,19 @@ public class TipoentidadBean implements GenericBean {
         this.id = id;
     }
 
-    public String getTipoentidad() {
-        return tipoentidad;
+    public String getTipomiembro() {
+        return tipomiembro;
     }
 
-    public void setTipoentidad(String tipoentidad) {
-        this.tipoentidad = tipoentidad;
-    }
-
-    public String getInicial() {
-        return inicial;
-    }
-
-    public void setInicial(String inicial) {
-        this.inicial = inicial;
+    public void setTipomiembro(String tipomiembro) {
+        this.tipomiembro = tipomiembro;
     }
 
     @Override
     public String getColumns() {
         String strColumns = "";
         strColumns += "id,";
-        strColumns += "tipoentidad,";
-        strColumns += "inicial";
+        strColumns += "tipomiembro";
         return strColumns;
     }
 
@@ -88,8 +77,7 @@ public class TipoentidadBean implements GenericBean {
     public String getValues() {
         String strColumns = "";
         strColumns += id + ",";
-        strColumns += EncodingUtilHelper.quotate(tipoentidad) + ",";
-        strColumns += EncodingUtilHelper.quotate(inicial);
+        strColumns += EncodingUtilHelper.quotate(tipomiembro);
         return strColumns;
     }
 
@@ -97,25 +85,19 @@ public class TipoentidadBean implements GenericBean {
     public String toPairs() {
         String strPairs = "";
 //        pairs  = "id = " + id + ",";
-//        strPairs += "tipoentidad=" + EncodingUtilHelper.quotate(tipoentidad) + ",";
-//        strPairs += "inicial=" + EncodingUtilHelper.quotate(inicial);
+//        strPairs += "tipomiembro=" + EncodingUtilHelper.quotate(tipomiembro) + ",";
         Boolean hay = false;
-        if (tipoentidad != null) {
-            strPairs += "nombre=" + EncodingUtilHelper.quotate(tipoentidad);
+        if (tipomiembro != null) {
+            strPairs += "tipomiembro=" + EncodingUtilHelper.quotate(tipomiembro);
             hay = true;
-        }
-        if (inicial != null) {
-            strPairs += (hay) ? ",inicial=" : "inicial=";
-            strPairs += EncodingUtilHelper.quotate(inicial);
         }
         return strPairs;
     }
 
     @Override
-    public TipoentidadBean fill(ResultSet oResultSet, Connection pooledConnection, PusuarioBean oPuserBean_security, Integer expand) throws SQLException, Exception {
+    public TipomiembroBean fill(ResultSet oResultSet, Connection pooledConnection, PusuarioBean oPuserBean_security, Integer expand) throws SQLException, Exception {
         this.setId(oResultSet.getInt("id"));
-        this.setTipoentidad(oResultSet.getString("tipoentidad"));
-        this.setInicial(oResultSet.getString("inicial"));
+        this.setTipomiembro(oResultSet.getString("tipomiembro"));
         return this;
     }
 

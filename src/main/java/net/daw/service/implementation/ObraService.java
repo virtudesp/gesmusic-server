@@ -192,6 +192,44 @@ public class ObraService implements TableServiceInterface, ViewServiceInterface 
         }
     }
 
+    public ReplyBean getpagexcompositor() throws Exception {
+        if (this.checkpermission("getpage")) {
+            int intRegsPerPag = ParameterCook.prepareRpp(oRequest);
+            int intPage = ParameterCook.preparePage(oRequest);
+            int intCompositor;
+            if (oRequest.getParameter("page") == null) {
+                intCompositor = 1; //throw exception
+            } else {
+                intCompositor = Integer.parseInt(oRequest.getParameter("page"));
+            }
+            HashMap<String, String> hmOrder = ParameterCook.getOrderParams(ParameterCook.prepareOrder(oRequest));
+            ArrayList<FilterBeanHelper> alFilter = ParameterCook.getFilterParams(ParameterCook.prepareFilter(oRequest));
+            String data = null;
+            Connection oConnection = null;
+            ConnectionInterface oDataConnectionSource = null;
+            try {
+                oDataConnectionSource = getSourceConnection();
+                oConnection = oDataConnectionSource.newConnection();
+                ObraDao oObraDao = new ObraDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), null);
+                List<ObraBean> arrBeans = oObraDao.getPageXCompositor(intCompositor,intRegsPerPag, intPage, alFilter, hmOrder, AppConfigurationHelper.getJsonMsgDepth());
+                data = JsonMessage.getJsonExpression(200, AppConfigurationHelper.getGson().toJson(arrBeans));
+            } catch (Exception ex) {
+                Log4j.errorLog(this.getClass().getName() + ":" + (ex.getStackTrace()[0]).getMethodName(), ex);
+                throw new Exception();
+            } finally {
+                if (oConnection != null) {
+                    oConnection.close();
+                }
+                if (oDataConnectionSource != null) {
+                    oDataConnectionSource.disposeConnection();
+                }
+            }
+            return new ReplyBean(200, data);
+        } else {
+            return new ReplyBean(401, JsonMessage.getJsonMsg(401, "Unauthorized"));
+        }
+    }
+
     @Override
     public ReplyBean remove() throws Exception {
         if (this.checkpermission("remove")) {
@@ -229,14 +267,14 @@ public class ObraService implements TableServiceInterface, ViewServiceInterface 
     @Override
     public ReplyBean set() throws Exception {
         if (this.checkpermission("set")) {
-            String jason = ParameterCook.prepareJson(oRequest);            
-            // Se necesita el id para diferenciar un insert de un update enviando como parámetro where al crear oEntidadBean 
+            String jason = ParameterCook.prepareJson(oRequest);
+            // Se necesita el id para diferenciar un insert de un update enviando como parámetro where al crear oMiembroBean 
             JsonParser parser = new JsonParser();
             JsonElement elementObject = parser.parse(jason);
             String strRequestId;
-            try{
+            try {
                 strRequestId = elementObject.getAsJsonObject().get("id").getAsString();
-            } catch (Exception e){
+            } catch (Exception e) {
                 strRequestId = "0";
             }
             Integer requestId = Integer.parseInt(strRequestId);

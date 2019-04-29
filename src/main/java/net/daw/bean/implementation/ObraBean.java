@@ -33,7 +33,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import net.daw.bean.publicinterface.GenericBean;
-import net.daw.dao.implementation.TipousuarioDao;
+import net.daw.dao.implementation.CompositorDao;
 import net.daw.helper.statics.EncodingUtilHelper;
 
 public class ObraBean implements GenericBean {
@@ -50,7 +50,7 @@ public class ObraBean implements GenericBean {
     @Expose(serialize = false)
     private Integer id_compositor = 0;
     @Expose(deserialize = false)
-    private TipousuarioBean obj_compositor = null;
+    private CompositorBean obj_compositor = null;
 
     public ObraBean() {
     }
@@ -99,11 +99,11 @@ public class ObraBean implements GenericBean {
         this.id_compositor = id_compositor;
     }
 
-    public TipousuarioBean getObj_compositor() {
+    public CompositorBean getObj_compositor() {
         return obj_compositor;
     }
 
-    public void setObj_compositor(TipousuarioBean obj_compositor) {
+    public void setObj_compositor(CompositorBean obj_compositor) {
         this.obj_compositor = obj_compositor;
     }
 
@@ -166,11 +166,11 @@ public class ObraBean implements GenericBean {
         this.setNotas(oResultSet.getString("notas"));
         
         if (expand > 0) {
-            TipousuarioBean oTipousuarioBean = new TipousuarioBean();
-            TipousuarioDao oTipousuarioDao = new TipousuarioDao(pooledConnection, oPuserBean_security, null);
-            oTipousuarioBean.setId(oResultSet.getInt("id_compositor"));
-            oTipousuarioBean = oTipousuarioDao.get(oTipousuarioBean, expand - 1);
-            this.setObj_compositor(oTipousuarioBean);
+            CompositorBean oCompositorBean = new CompositorBean();
+            CompositorDao oCompositorDao = new CompositorDao(pooledConnection, oPuserBean_security, null);
+            oCompositorBean.setId(oResultSet.getInt("id_compositor"));
+            oCompositorBean = oCompositorDao.get(oCompositorBean, expand - 1);
+            this.setObj_compositor(oCompositorBean);
         } else {
             this.setId_compositor(oResultSet.getInt("id_compositor"));
         }

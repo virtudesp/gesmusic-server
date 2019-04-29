@@ -10,7 +10,7 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.HashMap;
 import net.daw.bean.implementation.PusuarioBean;
-import net.daw.bean.implementation.EntidadBean;
+import net.daw.bean.implementation.MiembroBean;
 import net.daw.dao.publicinterface.TableDaoInterface;
 import net.daw.dao.publicinterface.ViewDaoInterface;
 import net.daw.data.implementation.MysqlData;
@@ -18,15 +18,15 @@ import net.daw.helper.statics.FilterBeanHelper;
 import net.daw.helper.statics.Log4j;
 import net.daw.helper.statics.SqlBuilder;
 
-public class EntidadDao implements ViewDaoInterface<EntidadBean>, TableDaoInterface<EntidadBean> {
+public class MiembroDao implements ViewDaoInterface<MiembroBean>, TableDaoInterface<MiembroBean> {
 
-    private String strTable = "entidad";
+    private String strTable = "miembro";
     private String strSQL = "select * from " + strTable + " where 1=1 ";
     private MysqlData oMysql = null;
     private Connection oConnection = null;
     private PusuarioBean oPuserSecurity = null;
 
-    public EntidadDao(Connection oPooledConnection, PusuarioBean oPuserBean_security, String strWhere) throws Exception {
+    public MiembroDao(Connection oPooledConnection, PusuarioBean oPuserBean_security, String strWhere) throws Exception {
         try {
             oConnection = oPooledConnection;
             oMysql = new MysqlData(oConnection);
@@ -54,17 +54,17 @@ public class EntidadDao implements ViewDaoInterface<EntidadBean>, TableDaoInterf
     }
 
     @Override
-    public ArrayList<EntidadBean> getPage(int intRegsPerPag, int intPage, ArrayList<FilterBeanHelper> alFilter, HashMap<String, String> hmOrder, Integer expand) throws Exception {
+    public ArrayList<MiembroBean> getPage(int intRegsPerPag, int intPage, ArrayList<FilterBeanHelper> alFilter, HashMap<String, String> hmOrder, Integer expand) throws Exception {
         strSQL += SqlBuilder.buildSqlWhere(alFilter);
         strSQL += SqlBuilder.buildSqlOrder(hmOrder);
         strSQL += SqlBuilder.buildSqlLimit(oMysql.getCount(strSQL), intRegsPerPag, intPage);
-        ArrayList<EntidadBean> arrUser = new ArrayList<>();
+        ArrayList<MiembroBean> arrMiembro = new ArrayList<>();
         ResultSet oResultSet = null;
         try {
             oResultSet = oMysql.getAllSQL(strSQL);
             while (oResultSet.next()) {
-                EntidadBean oEntidadBean = new EntidadBean();
-                arrUser.add((EntidadBean) oEntidadBean.fill(oResultSet, oConnection, oPuserSecurity, expand));
+                MiembroBean oMiembroBean = new MiembroBean();
+                arrMiembro.add((MiembroBean) oMiembroBean.fill(oResultSet, oConnection, oPuserSecurity, expand));
             }
             if (oResultSet != null) {
                 oResultSet.close();
@@ -77,20 +77,20 @@ public class EntidadDao implements ViewDaoInterface<EntidadBean>, TableDaoInterf
                 oResultSet.close();
             }
         }
-        return arrUser;
+        return arrMiembro;
     }
 
     @Override
-    public ArrayList<EntidadBean> getAll(ArrayList<FilterBeanHelper> alFilter, HashMap<String, String> hmOrder, Integer expand) throws Exception {
+    public ArrayList<MiembroBean> getAll(ArrayList<FilterBeanHelper> alFilter, HashMap<String, String> hmOrder, Integer expand) throws Exception {
         strSQL += SqlBuilder.buildSqlWhere(alFilter);
         strSQL += SqlBuilder.buildSqlOrder(hmOrder);
-        ArrayList<EntidadBean> arrUser = new ArrayList<>();
+        ArrayList<MiembroBean> arrMiembro = new ArrayList<>();
         ResultSet oResultSet = null;
         try {
             oResultSet = oMysql.getAllSQL(strSQL);
             while (oResultSet.next()) {
-                EntidadBean oEntidadBean = new EntidadBean();
-                arrUser.add((EntidadBean) oEntidadBean.fill(oResultSet, oConnection, oPuserSecurity, expand));
+                MiembroBean oMiembroBean = new MiembroBean();
+                arrMiembro.add(oMiembroBean.fill(oResultSet, oConnection, oPuserSecurity, expand));
             }
         } catch (Exception ex) {
             Log4j.errorLog(this.getClass().getName() + ":" + (ex.getStackTrace()[0]).getMethodName(), ex);
@@ -100,22 +100,22 @@ public class EntidadDao implements ViewDaoInterface<EntidadBean>, TableDaoInterf
                 oResultSet.close();
             }
         }
-        return arrUser;
+        return arrMiembro;
     }
 
     @Override
-    public EntidadBean get(EntidadBean oEntidadBean, Integer expand) throws Exception {
-        if (oEntidadBean.getId() > 0) {
+    public MiembroBean get(MiembroBean oMiembroBean, Integer expand) throws Exception {
+        if (oMiembroBean.getId() > 0) {
             ResultSet oResultSet = null;
             try {
-                oResultSet = oMysql.getAllSQL(strSQL + " And id= " + oEntidadBean.getId() + " ");
+                oResultSet = oMysql.getAllSQL(strSQL + " And id= " + oMiembroBean.getId() + " ");
                 Boolean empty = true;
                 while (oResultSet.next()) {
-                    oEntidadBean = (EntidadBean) oEntidadBean.fill(oResultSet, oConnection, oPuserSecurity, expand);
+                    oMiembroBean = (MiembroBean) oMiembroBean.fill(oResultSet, oConnection, oPuserSecurity, expand);
                     empty = false;
                 }
                 if (empty) {
-                    oEntidadBean.setId(0);
+                    oMiembroBean.setId(0);
                 }
             } catch (Exception ex) {
                 Log4j.errorLog(this.getClass().getName() + ":" + (ex.getStackTrace()[0]).getMethodName(), ex);
@@ -126,24 +126,24 @@ public class EntidadDao implements ViewDaoInterface<EntidadBean>, TableDaoInterf
                 }
             }
         } else {
-            oEntidadBean.setId(0);
+            oMiembroBean.setId(0);
         }
-        return oEntidadBean;
+        return oMiembroBean;
     }
 
     @Override
-    public Integer set(EntidadBean oEntidadBean) throws Exception {
+    public Integer set(MiembroBean oMiembroBean) throws Exception {
         Integer iResult = null;
         try {
-            if (oEntidadBean.getId() == 0) {
+            if (oMiembroBean.getId() == 0) {
                 strSQL = "INSERT INTO " + strTable + " ";
-                strSQL += "(" + oEntidadBean.getColumns() + ")";
-                strSQL += "VALUES(" + oEntidadBean.getValues() + ")";
+                strSQL += "(" + oMiembroBean.getColumns() + ")";
+                strSQL += "VALUES(" + oMiembroBean.getValues() + ")";
                 iResult = oMysql.executeInsertSQL(strSQL);
             } else {
                 strSQL = "UPDATE " + strTable + " ";
-                strSQL += " SET " + oEntidadBean.toPairs();
-                strSQL += " WHERE id=" + oEntidadBean.getId();
+                strSQL += " SET " + oMiembroBean.toPairs();
+                strSQL += " WHERE id=" + oMiembroBean.getId();
                 iResult = oMysql.executeUpdateSQL(strSQL);
             }
         } catch (Exception ex) {

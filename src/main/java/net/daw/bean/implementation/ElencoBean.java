@@ -34,7 +34,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import net.daw.bean.publicinterface.GenericBean;
 import net.daw.dao.implementation.AgrupacionDao;
-import net.daw.dao.implementation.EntidadDao;
+import net.daw.dao.implementation.MiembroDao;
 import net.daw.dao.implementation.RolDao;
 import net.daw.helper.statics.EncodingUtilHelper;
 
@@ -44,9 +44,9 @@ public class ElencoBean implements GenericBean {
     private Integer id = 0;
     
     @Expose(serialize = false)
-    private Integer id_entidad;
+    private Integer id_miembro;
     @Expose(deserialize = false)
-    private EntidadBean obj_entidad = null;
+    private MiembroBean obj_miembro = null;
     
     @Expose(serialize = false)
     private Integer id_agrupacion;
@@ -73,20 +73,20 @@ public class ElencoBean implements GenericBean {
         this.id = id;
     }
 
-    public Integer getId_entidad() {
-        return id_entidad;
+    public Integer getId_miembro() {
+        return id_miembro;
     }
 
-    public void setId_entidad(Integer id_entidad) {
-        this.id_entidad = id_entidad;
+    public void setId_miembro(Integer id_miembro) {
+        this.id_miembro = id_miembro;
     }
 
-    public EntidadBean getObj_entidad() {
-        return obj_entidad;
+    public MiembroBean getObj_miembro() {
+        return obj_miembro;
     }
 
-    public void setObj_entidad(EntidadBean obj_entidad) {
-        this.obj_entidad = obj_entidad;
+    public void setObj_miembro(MiembroBean obj_miembro) {
+        this.obj_miembro = obj_miembro;
     }
 
     public Integer getId_agrupacion() {
@@ -123,14 +123,14 @@ public class ElencoBean implements GenericBean {
 
     @Override
     public String getColumns() { 
-        return "id,id_entidad,id_agrupacion,id_rol";
+        return "id,id_miembro,id_agrupacion,id_rol";
     }
 
     @Override
     public String getValues() {
         String strColumns = "";
         strColumns += id + ",";
-        strColumns += id_entidad + ",";
+        strColumns += id_miembro + ",";
         strColumns += id_agrupacion + ",";
         strColumns += id_rol;
         return strColumns;
@@ -139,12 +139,12 @@ public class ElencoBean implements GenericBean {
     @Override
     public String toPairs() {
         String strPairs = "";
-//        strPairs += "id_entidad=" + id_entidad + ",";
+//        strPairs += "id_miembro=" + id_miembro + ",";
 //        strPairs += "id_agrupacion=" + id_agrupacion + ",";
 //        strPairs += "id_rol=" + id_rol;
         Boolean hay = false;
-        if (id_entidad != null) {
-            strPairs += "id_entidad=" + id_entidad;
+        if (id_miembro != null) {
+            strPairs += "id_miembro=" + id_miembro;
             hay = true;
         }
         if (id_agrupacion != null) {
@@ -163,13 +163,13 @@ public class ElencoBean implements GenericBean {
     public ElencoBean fill(ResultSet oResultSet, Connection pooledConnection, PusuarioBean oPusuarioBean_security, Integer expand) throws SQLException, Exception {
         this.setId(oResultSet.getInt("id"));
         if (expand > 0) {
-            EntidadBean oEntidadBean = new EntidadBean();
-            EntidadDao oEntidadDao = new EntidadDao(pooledConnection, oPusuarioBean_security, null);
-            oEntidadBean.setId(oResultSet.getInt("id_entidad"));
-            oEntidadBean = oEntidadDao.get(oEntidadBean, expand - 1);
-            this.setObj_entidad(oEntidadBean);
+            MiembroBean oMiembroBean = new MiembroBean();
+            MiembroDao oMiembroDao = new MiembroDao(pooledConnection, oPusuarioBean_security, null);
+            oMiembroBean.setId(oResultSet.getInt("id_miembro"));
+            oMiembroBean = oMiembroDao.get(oMiembroBean, expand - 1);
+            this.setObj_miembro(oMiembroBean);
         } else {
-            this.setId_entidad(oResultSet.getInt("id_entidad"));
+            this.setId_miembro(oResultSet.getInt("id_miembro"));
         }
 
         if (expand > 0) {

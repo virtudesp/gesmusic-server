@@ -33,7 +33,7 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.HashMap;
 import net.daw.bean.implementation.PusuarioBean;
-import net.daw.bean.implementation.TipoentidadBean;
+import net.daw.bean.implementation.TipomiembroBean;
 import net.daw.dao.publicinterface.TableDaoInterface;
 import net.daw.dao.publicinterface.ViewDaoInterface;
 import net.daw.data.implementation.MysqlData;
@@ -41,15 +41,15 @@ import net.daw.helper.statics.FilterBeanHelper;
 import net.daw.helper.statics.Log4j;
 import net.daw.helper.statics.SqlBuilder;
 
-public class TipoentidadDao implements ViewDaoInterface<TipoentidadBean>, TableDaoInterface<TipoentidadBean> {
+public class TipomiembroDao implements ViewDaoInterface<TipomiembroBean>, TableDaoInterface<TipomiembroBean> {
 
-    private String strTable = "tipoentidad";
+    private String strTable = "tipomiembro";
     private String strSQL = "select * from " + strTable + " where 1=1 ";
     private MysqlData oMysql = null;
     private Connection oConnection = null;
     private PusuarioBean oPuserSecurity = null;
 
-    public TipoentidadDao(Connection oPooledConnection, PusuarioBean oPuserBean_security, String strWhere) throws Exception {
+    public TipomiembroDao(Connection oPooledConnection, PusuarioBean oPuserBean_security, String strWhere) throws Exception {
         try {
             oConnection = oPooledConnection;
             oMysql = new MysqlData(oConnection);
@@ -77,16 +77,16 @@ public class TipoentidadDao implements ViewDaoInterface<TipoentidadBean>, TableD
     }
 
     @Override
-    public ArrayList<TipoentidadBean> getPage(int intRegsPerPag, int intPage, ArrayList<FilterBeanHelper> alFilter, HashMap<String, String> hmOrder, Integer expand) throws Exception {
+    public ArrayList<TipomiembroBean> getPage(int intRegsPerPag, int intPage, ArrayList<FilterBeanHelper> alFilter, HashMap<String, String> hmOrder, Integer expand) throws Exception {
         strSQL += SqlBuilder.buildSqlWhere(alFilter);
         strSQL += SqlBuilder.buildSqlOrder(hmOrder);
         strSQL += SqlBuilder.buildSqlLimit(oMysql.getCount(strSQL), intRegsPerPag, intPage);
-        ArrayList<TipoentidadBean> arrUsertype = new ArrayList<>();
+        ArrayList<TipomiembroBean> arrUsertype = new ArrayList<>();
         ResultSet oResultSet = null;
         try {
             oResultSet = oMysql.getAllSQL(strSQL);
             while (oResultSet.next()) {
-                TipoentidadBean oUsertypeBean = new TipoentidadBean();
+                TipomiembroBean oUsertypeBean = new TipomiembroBean();
                 arrUsertype.add(oUsertypeBean.fill(oResultSet, oConnection, oPuserSecurity, expand));
             }
             if (oResultSet != null) {
@@ -104,15 +104,15 @@ public class TipoentidadDao implements ViewDaoInterface<TipoentidadBean>, TableD
     }
 
     @Override
-    public ArrayList<TipoentidadBean> getAll(ArrayList<FilterBeanHelper> alFilter, HashMap<String, String> hmOrder, Integer expand) throws Exception {
+    public ArrayList<TipomiembroBean> getAll(ArrayList<FilterBeanHelper> alFilter, HashMap<String, String> hmOrder, Integer expand) throws Exception {
         strSQL += SqlBuilder.buildSqlWhere(alFilter);
         strSQL += SqlBuilder.buildSqlOrder(hmOrder);
-        ArrayList<TipoentidadBean> arrUsertype = new ArrayList<>();
+        ArrayList<TipomiembroBean> arrUsertype = new ArrayList<>();
         ResultSet oResultSet = null;
         try {
             oResultSet = oMysql.getAllSQL(strSQL);
             while (oResultSet.next()) {
-                TipoentidadBean oUsertypeBean = new TipoentidadBean();
+                TipomiembroBean oUsertypeBean = new TipomiembroBean();
                 arrUsertype.add(oUsertypeBean.fill(oResultSet, oConnection, oPuserSecurity, expand));
             }
         } catch (Exception ex) {
@@ -127,7 +127,7 @@ public class TipoentidadDao implements ViewDaoInterface<TipoentidadBean>, TableD
     }
 
     @Override
-    public TipoentidadBean get(TipoentidadBean oUsertypeBean, Integer expand) throws Exception {
+    public TipomiembroBean get(TipomiembroBean oUsertypeBean, Integer expand) throws Exception {
         if (oUsertypeBean.getId() > 0) {
             ResultSet oResultSet = null;
             try {
@@ -155,7 +155,7 @@ public class TipoentidadDao implements ViewDaoInterface<TipoentidadBean>, TableD
     }
 
     @Override
-    public Integer set(TipoentidadBean oUsertypeBean) throws Exception {
+    public Integer set(TipomiembroBean oUsertypeBean) throws Exception {
         Integer iResult = null;
         try {
             if (oUsertypeBean.getId() == 0) {

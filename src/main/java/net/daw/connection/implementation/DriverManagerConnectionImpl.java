@@ -58,14 +58,17 @@ public class DriverManagerConnectionImpl implements ConnectionInterface {
 //
 //http://localhost:8081/gesmusic-server/json?ob=tipousuario&op=getall
 //
+//http://localhost:8081/gesmusic-server/json?ob=rol&op=getpage&page=2&10
+//
 //http://localhost:8081/gesmusic-server/json?ob=tipousuario&op=get&id=2
 //
 //http://localhost:8081/gesmusic-server/json?ob=tipousuario&op=set&json={"tipousuario":"nsnc"}
 
-//ob=entidad&op=set&json={"numero":"S00022","nombre":"Rosa","apellidos":"Uno Dos","id_sociedad":"1","id_tipoentidad":"2"}
-///http://localhost:8081/gesmusic-server/json?ob=elenco&op=set&json={"id_entidad":"1","id_agrupacion":"1","id_rol":"1"}
+//ob=miembro&op=set&json={"numero":"S00022","nombre":"Rosa","apellidos":"Uno Dos","id_sociedad":"1","id_tipomiembro":"2"}
+///http://localhost:8081/gesmusic-server/json?ob=elenco&op=set&json={"id_miembro":"1","id_agrupacion":"1","id_rol":"1"}
+//http://localhost:8081/gesmusic-server/json?ob=tipomiembro&op=set&json={"id":"4","tipomiembro":"cocineroooooo"}
 
-//ob=entidad&op=set&json={"id":"64","nombre":"David"}
+//http://localhost:8081/gesmusic-server/json?ob=usuario&op=set&json={"id":"0","username":"David","userpass":"iniested","id_tipousuario":"4"}
 
-//ob=entidad&op=remove&id=63
+//ob=miembro&op=remove&id=63
 //ALTER TABLE participa DROP FOREIGN KEY fk_participa_acto1;

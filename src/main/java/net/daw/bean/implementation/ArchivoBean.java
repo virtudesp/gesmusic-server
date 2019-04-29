@@ -23,7 +23,7 @@ public class ArchivoBean implements GenericBean {
     @Expose
     private String origen;
     @Expose
-    private String estado;
+    private String arreglo;
     
     @Expose(serialize = false)
     private Integer id_obra; 
@@ -61,12 +61,12 @@ public class ArchivoBean implements GenericBean {
         this.origen = origen;
     }
 
-    public String getEstado() {
-        return estado;
+    public String getArreglo() {
+        return arreglo;
     }
 
-    public void setEstado(String estado) {
-        this.estado = estado;
+    public void setArreglo(String arreglo) {
+        this.arreglo = arreglo;
     }
 
     public Integer getId_obra() {
@@ -92,7 +92,7 @@ public class ArchivoBean implements GenericBean {
         strColumns += "id,";
         strColumns += "alta,";
         strColumns += "origen,";
-        strColumns += "estado,";
+        strColumns += "arreglo,";
         strColumns += "id_obra";
         return strColumns;
     }
@@ -109,7 +109,7 @@ public class ArchivoBean implements GenericBean {
             strColumns += EncodingUtilHelper.stringifyAndQuotate(alta);
         }
         strColumns += EncodingUtilHelper.quotate(getOrigen()) + ",";
-        strColumns += EncodingUtilHelper.quotate(getEstado()) + ",";
+        strColumns += EncodingUtilHelper.quotate(getArreglo()) + ",";
         strColumns += id_obra;        
         return strColumns;
     }
@@ -119,7 +119,7 @@ public class ArchivoBean implements GenericBean {
         String strPairs = ""; 
 //        strPairs += "alta=" + EncodingUtilHelper.stringifyAndQuotate(alta);       
 //        strPairs += "origen=" + EncodingUtilHelper.quotate(getOrigen()) + ",";
-//        strPairs += "estado=" + EncodingUtilHelper.quotate(getEstado()) + ",";
+//        strPairs += "arreglo=" + EncodingUtilHelper.quotate(getArreglo()) + ",";
 //        strPairs += "id_obra=" + getObra();
         Boolean hay = false;
         if (alta != null) {
@@ -131,9 +131,9 @@ public class ArchivoBean implements GenericBean {
             strPairs += EncodingUtilHelper.quotate(getOrigen());
             hay = true;
         }
-        if (estado != null) {
-            strPairs += (hay) ? ",estado=" : "estado=";
-            strPairs += EncodingUtilHelper.quotate(getEstado());
+        if (arreglo != null) {
+            strPairs += (hay) ? ",arreglo=" : "arreglo=";
+            strPairs += EncodingUtilHelper.quotate(getArreglo());
             hay = true;
         }
         if (id_obra != null) {
@@ -148,7 +148,7 @@ public class ArchivoBean implements GenericBean {
         this.setId(oResultSet.getInt("id"));
         this.setAlta(oResultSet.getTimestamp("alta"));
         this.setOrigen(oResultSet.getString("origen"));
-        this.setEstado(oResultSet.getString("estado"));
+        this.setArreglo(oResultSet.getString("arreglo"));
         
         if (expand > 0) {
             ObraBean oObraBean = new ObraBean();
