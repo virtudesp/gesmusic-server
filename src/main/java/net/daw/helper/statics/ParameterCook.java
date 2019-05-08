@@ -124,6 +124,17 @@ public class ParameterCook {
         }
         return intPage;
     }
+    
+    // Para recuperar la id de la clave ajena en el caso de que exista como parametro de plist    
+    public static Integer prepareForeignId(HttpServletRequest request) {
+        int foreignId;
+        if (request.getParameter("id") == null) {
+            foreignId = 0;
+        } else {
+            foreignId = Integer.parseInt(request.getParameter("id"));
+        }
+        return foreignId;
+    }
 
     public static String prepareOrder(HttpServletRequest oRequest) {
         String strOrder = oRequest.getParameter("order");

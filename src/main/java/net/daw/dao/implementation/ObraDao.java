@@ -77,10 +77,25 @@ public class ObraDao implements ViewDaoInterface<ObraBean>, TableDaoInterface<Ob
         }
         return pages;
     }
+    
+    public Long getCountXCompositor(ArrayList<FilterBeanHelper> hmFilter) throws Exception {
+        strSQL += SqlBuilder.buildSqlWhere(hmFilter);
+        Long pages = 0L;
+        try {
+            pages = oMysql.getCount(strSQL);
+        } catch (Exception ex) {
+            Log4j.errorLog(this.getClass().getName() + ":" + (ex.getStackTrace()[0]).getMethodName(), ex);
+            throw new Exception();
+        }
+        return pages;
+    }
 
     @Override
     public ArrayList<ObraBean> getPage(int intRegsPerPag, int intPage, ArrayList<FilterBeanHelper> alFilter, HashMap<String, String> hmOrder, Integer expand) throws Exception {
+//    public ArrayList<ObraBean> getPage(int idCompositor, int intRegsPerPag, int intPage, ArrayList<FilterBeanHelper> alFilter, HashMap<String, String> hmOrder, Integer expand) throws Exception {
         strSQL += SqlBuilder.buildSqlWhere(alFilter);
+        // comprobamos si hay idCompositor
+//        strSQL += " and id_compositor= " + idCompositor + " ";
         strSQL += SqlBuilder.buildSqlOrder(hmOrder);
         strSQL += SqlBuilder.buildSqlLimit(oMysql.getCount(strSQL), intRegsPerPag, intPage);
         ArrayList<ObraBean> arrUser = new ArrayList<>();

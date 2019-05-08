@@ -60,6 +60,8 @@ public class DriverManagerConnectionImpl implements ConnectionInterface {
 //
 //http://localhost:8081/gesmusic-server/json?ob=rol&op=getpage&page=2&10
 //
+//http://localhost:8081/gesmusic-server/json?ob=obra&op=getPageXCompositor&id=3&page=2&10
+//
 //http://localhost:8081/gesmusic-server/json?ob=tipousuario&op=get&id=2
 //
 //http://localhost:8081/gesmusic-server/json?ob=tipousuario&op=set&json={"tipousuario":"nsnc"}

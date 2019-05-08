@@ -96,6 +96,34 @@ public class ObraService implements TableServiceInterface, ViewServiceInterface 
         }
     }
 
+    public ReplyBean getcountxcompositor() throws Exception {
+        if (this.checkpermission("getcount")) {
+            String data = null;
+            ArrayList<FilterBeanHelper> alFilter = ParameterCook.getFilterParams(ParameterCook.prepareFilter(oRequest));
+            Connection oConnection = null;
+            ConnectionInterface oDataConnectionSource = null;
+            try {
+                oDataConnectionSource = getSourceConnection();
+                oConnection = oDataConnectionSource.newConnection();
+                ObraDao oObraDao = new ObraDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), null);
+                data = JsonMessage.getJsonExpression(200, Long.toString(oObraDao.getCount(alFilter)));
+            } catch (Exception ex) {
+                Log4j.errorLog(this.getClass().getName() + ":" + (ex.getStackTrace()[0]).getMethodName(), ex);
+                throw new Exception();
+            } finally {
+                if (oConnection != null) {
+                    oConnection.close();
+                }
+                if (oDataConnectionSource != null) {
+                    oDataConnectionSource.disposeConnection();
+                }
+            }
+            return new ReplyBean(200, data);
+        } else {
+            return new ReplyBean(401, JsonMessage.getJsonMsg(401, "Unauthorized"));
+        }
+    }
+    
     @Override
     public ReplyBean get() throws Exception {
         if (this.checkpermission("get")) {
@@ -164,6 +192,8 @@ public class ObraService implements TableServiceInterface, ViewServiceInterface 
         if (this.checkpermission("getpage")) {
             int intRegsPerPag = ParameterCook.prepareRpp(oRequest);
             int intPage = ParameterCook.preparePage(oRequest);
+            //añadido parámetro
+            int idCompositor = ParameterCook.prepareForeignId(oRequest);
             HashMap<String, String> hmOrder = ParameterCook.getOrderParams(ParameterCook.prepareOrder(oRequest));
             ArrayList<FilterBeanHelper> alFilter = ParameterCook.getFilterParams(ParameterCook.prepareFilter(oRequest));
             String data = null;
@@ -173,7 +203,8 @@ public class ObraService implements TableServiceInterface, ViewServiceInterface 
                 oDataConnectionSource = getSourceConnection();
                 oConnection = oDataConnectionSource.newConnection();
                 ObraDao oObraDao = new ObraDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), null);
-                List<ObraBean> arrBeans = oObraDao.getPage(intRegsPerPag, intPage, alFilter, hmOrder, AppConfigurationHelper.getJsonMsgDepth());
+//                List<ObraBean> arrBeans = oObraDao.getPage(intRegsPerPag, intPage, alFilter, hmOrder, AppConfigurationHelper.getJsonMsgDepth());
+                List<ObraBean> arrBeans = oObraDao.getPageXCompositor(idCompositor, intRegsPerPag, intPage, alFilter, hmOrder, AppConfigurationHelper.getJsonMsgDepth());
                 data = JsonMessage.getJsonExpression(200, AppConfigurationHelper.getGson().toJson(arrBeans));
             } catch (Exception ex) {
                 Log4j.errorLog(this.getClass().getName() + ":" + (ex.getStackTrace()[0]).getMethodName(), ex);
@@ -196,12 +227,13 @@ public class ObraService implements TableServiceInterface, ViewServiceInterface 
         if (this.checkpermission("getpage")) {
             int intRegsPerPag = ParameterCook.prepareRpp(oRequest);
             int intPage = ParameterCook.preparePage(oRequest);
-            int intCompositor;
-            if (oRequest.getParameter("page") == null) {
-                intCompositor = 1; //throw exception
-            } else {
-                intCompositor = Integer.parseInt(oRequest.getParameter("page"));
-            }
+            //añadido parámetro
+            int intCompositor = ParameterCook.prepareForeignId(oRequest);
+//            if (oRequest.getParameter("page") == null) {
+//                intCompositor = 1; //throw exception
+//            } else {
+//                intCompositor = Integer.parseInt(oRequest.getParameter("page"));
+//            }
             HashMap<String, String> hmOrder = ParameterCook.getOrderParams(ParameterCook.prepareOrder(oRequest));
             ArrayList<FilterBeanHelper> alFilter = ParameterCook.getFilterParams(ParameterCook.prepareFilter(oRequest));
             String data = null;
@@ -268,7 +300,7 @@ public class ObraService implements TableServiceInterface, ViewServiceInterface 
     public ReplyBean set() throws Exception {
         if (this.checkpermission("set")) {
             String jason = ParameterCook.prepareJson(oRequest);
-            // Se necesita el id para diferenciar un insert de un update enviando como parámetro where al crear oMiembroBean 
+            // Se necesita el id para diferenciar un insert de un update enviando como parámetro where al crear oObraBean 
             JsonParser parser = new JsonParser();
             JsonElement elementObject = parser.parse(jason);
             String strRequestId;
