@@ -70,6 +70,8 @@ public class ObraService implements TableServiceInterface, ViewServiceInterface 
     @Override
     public ReplyBean getcount() throws Exception {
         if (this.checkpermission("getcount")) {
+            // parámetro añadido
+            int idCompositor = ParameterCook.prepareId(oRequest);
             String data = null;
             ArrayList<FilterBeanHelper> alFilter = ParameterCook.getFilterParams(ParameterCook.prepareFilter(oRequest));
             Connection oConnection = null;
@@ -78,7 +80,12 @@ public class ObraService implements TableServiceInterface, ViewServiceInterface 
                 oDataConnectionSource = getSourceConnection();
                 oConnection = oDataConnectionSource.newConnection();
                 ObraDao oObraDao = new ObraDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), null);
-                data = JsonMessage.getJsonExpression(200, Long.toString(oObraDao.getCount(alFilter)));
+                // Si no hay idCompositor el método es de obra y si hay idCompositor es de obrasxcompositor
+                if (idCompositor == 0) {
+                    data = JsonMessage.getJsonExpression(200, Long.toString(oObraDao.getCount(alFilter)));
+                } else {
+                    data = JsonMessage.getJsonExpression(200, Long.toString(oObraDao.getCountXCompositor(idCompositor, alFilter)));
+                }
             } catch (Exception ex) {
                 Log4j.errorLog(this.getClass().getName() + ":" + (ex.getStackTrace()[0]).getMethodName(), ex);
                 throw new Exception();
@@ -96,34 +103,6 @@ public class ObraService implements TableServiceInterface, ViewServiceInterface 
         }
     }
 
-    public ReplyBean getcountxcompositor() throws Exception {
-        if (this.checkpermission("getcount")) {
-            String data = null;
-            ArrayList<FilterBeanHelper> alFilter = ParameterCook.getFilterParams(ParameterCook.prepareFilter(oRequest));
-            Connection oConnection = null;
-            ConnectionInterface oDataConnectionSource = null;
-            try {
-                oDataConnectionSource = getSourceConnection();
-                oConnection = oDataConnectionSource.newConnection();
-                ObraDao oObraDao = new ObraDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), null);
-                data = JsonMessage.getJsonExpression(200, Long.toString(oObraDao.getCount(alFilter)));
-            } catch (Exception ex) {
-                Log4j.errorLog(this.getClass().getName() + ":" + (ex.getStackTrace()[0]).getMethodName(), ex);
-                throw new Exception();
-            } finally {
-                if (oConnection != null) {
-                    oConnection.close();
-                }
-                if (oDataConnectionSource != null) {
-                    oDataConnectionSource.disposeConnection();
-                }
-            }
-            return new ReplyBean(200, data);
-        } else {
-            return new ReplyBean(401, JsonMessage.getJsonMsg(401, "Unauthorized"));
-        }
-    }
-    
     @Override
     public ReplyBean get() throws Exception {
         if (this.checkpermission("get")) {
@@ -159,40 +138,7 @@ public class ObraService implements TableServiceInterface, ViewServiceInterface 
     @Override
     public ReplyBean getall() throws Exception {
         if (this.checkpermission("getall")) {
-            HashMap<String, String> hmOrder = ParameterCook.getOrderParams(ParameterCook.prepareOrder(oRequest));
-            ArrayList<FilterBeanHelper> alFilter = ParameterCook.getFilterParams(ParameterCook.prepareFilter(oRequest));
-            String data = null;
-            Connection oConnection = null;
-            ConnectionInterface oDataConnectionSource = null;
-            try {
-                oDataConnectionSource = getSourceConnection();
-                oConnection = oDataConnectionSource.newConnection();
-                ObraDao oObraDao = new ObraDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), null);
-                ArrayList<ObraBean> arrBeans = oObraDao.getAll(alFilter, hmOrder, AppConfigurationHelper.getJsonMsgDepth());
-                data = JsonMessage.getJsonExpression(200, AppConfigurationHelper.getGson().toJson(arrBeans));
-            } catch (Exception ex) {
-                Log4j.errorLog(this.getClass().getName() + ":" + (ex.getStackTrace()[0]).getMethodName(), ex);
-                throw new Exception();
-            } finally {
-                if (oConnection != null) {
-                    oConnection.close();
-                }
-                if (oDataConnectionSource != null) {
-                    oDataConnectionSource.disposeConnection();
-                }
-            }
-            return new ReplyBean(200, data);
-        } else {
-            return new ReplyBean(401, JsonMessage.getJsonMsg(401, "Unauthorized"));
-        }
-    }
-
-    @Override
-    public ReplyBean getpage() throws Exception {
-        if (this.checkpermission("getpage")) {
-            int intRegsPerPag = ParameterCook.prepareRpp(oRequest);
-            int intPage = ParameterCook.preparePage(oRequest);
-            //añadido parámetro
+            // parámetro añadido
             int idCompositor = ParameterCook.prepareForeignId(oRequest);
             HashMap<String, String> hmOrder = ParameterCook.getOrderParams(ParameterCook.prepareOrder(oRequest));
             ArrayList<FilterBeanHelper> alFilter = ParameterCook.getFilterParams(ParameterCook.prepareFilter(oRequest));
@@ -203,8 +149,13 @@ public class ObraService implements TableServiceInterface, ViewServiceInterface 
                 oDataConnectionSource = getSourceConnection();
                 oConnection = oDataConnectionSource.newConnection();
                 ObraDao oObraDao = new ObraDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), null);
-//                List<ObraBean> arrBeans = oObraDao.getPage(intRegsPerPag, intPage, alFilter, hmOrder, AppConfigurationHelper.getJsonMsgDepth());
-                List<ObraBean> arrBeans = oObraDao.getPageXCompositor(idCompositor, intRegsPerPag, intPage, alFilter, hmOrder, AppConfigurationHelper.getJsonMsgDepth());
+                // Si no hay idCompositor el método es de obra y si hay idCompositor es de obrasxcompositor
+                ArrayList<ObraBean> arrBeans;
+                if (idCompositor == 0) {
+                    arrBeans = oObraDao.getAll(alFilter, hmOrder, AppConfigurationHelper.getJsonMsgDepth());
+                } else {
+                    arrBeans = oObraDao.getAllXCompositor(idCompositor, alFilter, hmOrder, AppConfigurationHelper.getJsonMsgDepth());
+                }
                 data = JsonMessage.getJsonExpression(200, AppConfigurationHelper.getGson().toJson(arrBeans));
             } catch (Exception ex) {
                 Log4j.errorLog(this.getClass().getName() + ":" + (ex.getStackTrace()[0]).getMethodName(), ex);
@@ -221,19 +172,15 @@ public class ObraService implements TableServiceInterface, ViewServiceInterface 
         } else {
             return new ReplyBean(401, JsonMessage.getJsonMsg(401, "Unauthorized"));
         }
-    }
-
-    public ReplyBean getpagexcompositor() throws Exception {
+    }    
+    
+    @Override
+    public ReplyBean getpage() throws Exception {
         if (this.checkpermission("getpage")) {
             int intRegsPerPag = ParameterCook.prepareRpp(oRequest);
             int intPage = ParameterCook.preparePage(oRequest);
-            //añadido parámetro
-            int intCompositor = ParameterCook.prepareForeignId(oRequest);
-//            if (oRequest.getParameter("page") == null) {
-//                intCompositor = 1; //throw exception
-//            } else {
-//                intCompositor = Integer.parseInt(oRequest.getParameter("page"));
-//            }
+            // parámetro añadido
+            int idCompositor = ParameterCook.prepareId(oRequest);
             HashMap<String, String> hmOrder = ParameterCook.getOrderParams(ParameterCook.prepareOrder(oRequest));
             ArrayList<FilterBeanHelper> alFilter = ParameterCook.getFilterParams(ParameterCook.prepareFilter(oRequest));
             String data = null;
@@ -243,7 +190,13 @@ public class ObraService implements TableServiceInterface, ViewServiceInterface 
                 oDataConnectionSource = getSourceConnection();
                 oConnection = oDataConnectionSource.newConnection();
                 ObraDao oObraDao = new ObraDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), null);
-                List<ObraBean> arrBeans = oObraDao.getPageXCompositor(intCompositor,intRegsPerPag, intPage, alFilter, hmOrder, AppConfigurationHelper.getJsonMsgDepth());
+                // Si no hay idCompositor el método es de obra y si hay idCompositor es de obrasxcompositor
+                List<ObraBean> arrBeans;
+                if (idCompositor == 0) {
+                    arrBeans = oObraDao.getPage(intRegsPerPag, intPage, alFilter, hmOrder, AppConfigurationHelper.getJsonMsgDepth());
+                } else {
+                    arrBeans = oObraDao.getPageXCompositor(idCompositor, intRegsPerPag, intPage, alFilter, hmOrder, AppConfigurationHelper.getJsonMsgDepth());
+                }
                 data = JsonMessage.getJsonExpression(200, AppConfigurationHelper.getGson().toJson(arrBeans));
             } catch (Exception ex) {
                 Log4j.errorLog(this.getClass().getName() + ":" + (ex.getStackTrace()[0]).getMethodName(), ex);
@@ -300,23 +253,20 @@ public class ObraService implements TableServiceInterface, ViewServiceInterface 
     public ReplyBean set() throws Exception {
         if (this.checkpermission("set")) {
             String jason = ParameterCook.prepareJson(oRequest);
-            // Se necesita el id para diferenciar un insert de un update enviando como parámetro where al crear oObraBean 
             JsonParser parser = new JsonParser();
             JsonElement elementObject = parser.parse(jason);
-            String strRequestId;
-            try {
-                strRequestId = elementObject.getAsJsonObject().get("id").getAsString();
-            } catch (Exception e) {
-                strRequestId = "0";
-            }
-            Integer requestId = Integer.parseInt(strRequestId);
+            // Se necesita el id para diferenciar un insert de un update enviando como parámetro where al crear oObraBean             
+            Integer id = ParameterCook.prepareId(oRequest);
             String where = "";
-            if (requestId == 0) {
-                where = null;
+            if (id == 0) {
+                where = null; // para insertar una nueva obra
             } else {
-                where += " where id=" + requestId;
+                where += " where id=" + id; // para modificar una obra 
             }
+            // Parámetro añadido paa relaciones 1:n
+            int idCompositor = ParameterCook.prepareForeignId(oRequest);
             // hasta aquí lo que he añadido yo
+
             ReplyBean oReplyBean = new ReplyBean();
             Connection oConnection = null;
             ConnectionInterface oDataConnectionSource = null;
@@ -328,14 +278,32 @@ public class ObraService implements TableServiceInterface, ViewServiceInterface 
 //                ObraBean oObraBean = new ObraBean();
                 ObraDao oObraDao = new ObraDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), where);
                 ObraBean oObraBean;
-                if (requestId == 0) {
-                    oObraBean = new ObraBean();
+                // Se crea el objeto según los parámetros que hay
+                if (idCompositor == 0) {
+                    // para obra
+                    if (id == 0) {
+                        oObraBean = new ObraBean(); // nueva obra
+                    } else {
+                        oObraBean = new ObraBean(id); // actualizar una obra 
+                    }
                 } else {
-                    oObraBean = new ObraBean(requestId);
+                    // para obrasxcompositor
+                    if (id == 0) {
+                        oObraBean = new ObraBean(idCompositor, true); // crear una obra del compositor idCompositor
+                    } else {
+                        oObraBean = new ObraBean(id, idCompositor, true); // actualizar una obra  del compositor idCompositor
+                    }
                 }
                 oObraBean = AppConfigurationHelper.getGson().fromJson(jason, oObraBean.getClass());
                 if (oObraBean != null) {
-                    Integer iResult = oObraDao.set(oObraBean);
+                    Integer iResult;
+                    // Si no hay idCompositor el método es de obra y si hay idCompositor es de obrasxcompositor
+                    if (idCompositor == 0) {
+                        iResult = oObraDao.set(oObraBean);
+                    } else {
+                        iResult = oObraDao.setXCompositor(oObraBean, idCompositor);
+                    }
+
                     if (iResult >= 1) {
                         oReplyBean.setCode(200);
                         oReplyBean.setJson(JsonMessage.getJsonExpression(200, iResult.toString()));

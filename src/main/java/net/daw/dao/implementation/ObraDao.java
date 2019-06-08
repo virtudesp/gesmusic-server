@@ -78,7 +78,9 @@ public class ObraDao implements ViewDaoInterface<ObraBean>, TableDaoInterface<Ob
         return pages;
     }
     
-    public Long getCountXCompositor(ArrayList<FilterBeanHelper> hmFilter) throws Exception {
+    public Long getCountXCompositor(int idCompositor, ArrayList<FilterBeanHelper> hmFilter) throws Exception {
+        // definir la nueva condición de la sql
+        strSQL += " and id_compositor= " + idCompositor + " "; 
         strSQL += SqlBuilder.buildSqlWhere(hmFilter);
         Long pages = 0L;
         try {
@@ -92,10 +94,7 @@ public class ObraDao implements ViewDaoInterface<ObraBean>, TableDaoInterface<Ob
 
     @Override
     public ArrayList<ObraBean> getPage(int intRegsPerPag, int intPage, ArrayList<FilterBeanHelper> alFilter, HashMap<String, String> hmOrder, Integer expand) throws Exception {
-//    public ArrayList<ObraBean> getPage(int idCompositor, int intRegsPerPag, int intPage, ArrayList<FilterBeanHelper> alFilter, HashMap<String, String> hmOrder, Integer expand) throws Exception {
         strSQL += SqlBuilder.buildSqlWhere(alFilter);
-        // comprobamos si hay idCompositor
-//        strSQL += " and id_compositor= " + idCompositor + " ";
         strSQL += SqlBuilder.buildSqlOrder(hmOrder);
         strSQL += SqlBuilder.buildSqlLimit(oMysql.getCount(strSQL), intRegsPerPag, intPage);
         ArrayList<ObraBean> arrUser = new ArrayList<>();
@@ -120,12 +119,10 @@ public class ObraDao implements ViewDaoInterface<ObraBean>, TableDaoInterface<Ob
         return arrUser;
     }
 
-    public ArrayList<ObraBean> getPageXCompositor(int idCompositor,int intRegsPerPag, int intPage, ArrayList<FilterBeanHelper> alFilter, HashMap<String, String> hmOrder, Integer expand) throws Exception {
-        
-        strSQL += " and id_compositor= " + idCompositor + " ";
-        
-        strSQL += SqlBuilder.buildSqlWhere(alFilter);
-        
+    public ArrayList<ObraBean> getPageXCompositor(int idCompositor, int intRegsPerPag, int intPage, ArrayList<FilterBeanHelper> alFilter, HashMap<String, String> hmOrder, Integer expand) throws Exception {
+        // definir la nueva condición de la sql
+        strSQL += " and id_compositor= " + idCompositor + " ";        
+        strSQL += SqlBuilder.buildSqlWhere(alFilter);        
         strSQL += SqlBuilder.buildSqlOrder(hmOrder);
         strSQL += SqlBuilder.buildSqlLimit(oMysql.getCount(strSQL), intRegsPerPag, intPage);
         ArrayList<ObraBean> arrUser = new ArrayList<>();
@@ -152,6 +149,31 @@ public class ObraDao implements ViewDaoInterface<ObraBean>, TableDaoInterface<Ob
 
     @Override
     public ArrayList<ObraBean> getAll(ArrayList<FilterBeanHelper> alFilter, HashMap<String, String> hmOrder, Integer expand) throws Exception {
+        strSQL += SqlBuilder.buildSqlWhere(alFilter);
+        strSQL += SqlBuilder.buildSqlOrder(hmOrder);
+        ArrayList<ObraBean> arrUser = new ArrayList<>();
+        ResultSet oResultSet = null;
+        try {
+            oResultSet = oMysql.getAllSQL(strSQL);
+            while (oResultSet.next()) {
+                ObraBean oUserBean = new ObraBean();
+                arrUser.add((ObraBean) oUserBean.fill(oResultSet, oConnection, oPuserSecurity, expand));
+            }
+        } catch (Exception ex) {
+            Log4j.errorLog(this.getClass().getName() + ":" + (ex.getStackTrace()[0]).getMethodName(), ex);
+            throw new Exception();
+        } finally {
+            if (oResultSet != null) {
+                oResultSet.close();
+            }
+        }
+        return arrUser;
+    }
+    
+    // Para obtener todas las obras de un compositor    @Override
+    public ArrayList<ObraBean> getAllXCompositor(int idCompositor, ArrayList<FilterBeanHelper> alFilter, HashMap<String, String> hmOrder, Integer expand) throws Exception {
+        // definir la nueva condición de la sql
+        strSQL += " and id_compositor= " + idCompositor + " ";
         strSQL += SqlBuilder.buildSqlWhere(alFilter);
         strSQL += SqlBuilder.buildSqlOrder(hmOrder);
         ArrayList<ObraBean> arrUser = new ArrayList<>();
@@ -202,18 +224,39 @@ public class ObraDao implements ViewDaoInterface<ObraBean>, TableDaoInterface<Ob
     }
 
     @Override
-    public Integer set(ObraBean oUserBean) throws Exception {
+    public Integer set(ObraBean oObraBean) throws Exception {
         Integer iResult = null;
         try {
-            if (oUserBean.getId() == 0) {
+            if (oObraBean.getId() == 0) {
                 strSQL = "INSERT INTO " + strTable + " ";
-                strSQL += "(" + oUserBean.getColumns() + ")";
-                strSQL += "VALUES(" + oUserBean.getValues() + ")";
+                strSQL += "(" + oObraBean.getColumns() + ")";
+                strSQL += "VALUES(" + oObraBean.getValues() + ")";
                 iResult = oMysql.executeInsertSQL(strSQL);
             } else {
                 strSQL = "UPDATE " + strTable + " ";
-                strSQL += " SET " + oUserBean.toPairs();
-                strSQL += " WHERE id=" + oUserBean.getId();
+                strSQL += " SET " + oObraBean.toPairs();
+                strSQL += " WHERE id=" + oObraBean.getId();
+                iResult = oMysql.executeUpdateSQL(strSQL);
+            }
+        } catch (Exception ex) {
+            Log4j.errorLog(this.getClass().getName() + ":" + (ex.getStackTrace()[0]).getMethodName(), ex);
+            throw new Exception();
+        }
+        return iResult;
+    }
+    // Dado un compositor, crear una nueva obra o modificar una ya existente
+    public Integer setXCompositor(ObraBean oObraBean, Integer idCompositor) throws Exception {
+        Integer iResult = null;
+        try {
+            if (oObraBean.getId() == 0) {
+                strSQL = "INSERT INTO " + strTable + " ";
+                strSQL += "(" + oObraBean.getColumns() + ")";
+                strSQL += "VALUES(" + oObraBean.getValuesXCompositor(idCompositor) + ")";
+                iResult = oMysql.executeInsertSQL(strSQL);
+            } else {
+                strSQL = "UPDATE " + strTable;
+                strSQL += " SET " + oObraBean.toPairsXCompositor(idCompositor);
+                strSQL += " WHERE id=" + oObraBean.getId();
                 iResult = oMysql.executeUpdateSQL(strSQL);
             }
         } catch (Exception ex) {

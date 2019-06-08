@@ -74,6 +74,17 @@ public class ParameterCook {
         }
         return result;
     }
+    
+    // Para recuperar la id de la clave ajena en el caso de que exista como parámetro   
+    public static Integer prepareForeignId(HttpServletRequest request) {
+        int foreignId;
+        if (request.getParameter("foreign") == null) {
+            foreignId = 0;
+        } else {
+            foreignId = Integer.parseInt(request.getParameter("foreign"));
+        }
+        return foreignId;
+    }
 
     public static String prepareJson(HttpServletRequest request) {
         String result = null;
@@ -123,17 +134,6 @@ public class ParameterCook {
             intPage = Integer.parseInt(request.getParameter("page"));
         }
         return intPage;
-    }
-    
-    // Para recuperar la id de la clave ajena en el caso de que exista como parametro de plist    
-    public static Integer prepareForeignId(HttpServletRequest request) {
-        int foreignId;
-        if (request.getParameter("id") == null) {
-            foreignId = 0;
-        } else {
-            foreignId = Integer.parseInt(request.getParameter("id"));
-        }
-        return foreignId;
     }
 
     public static String prepareOrder(HttpServletRequest oRequest) {

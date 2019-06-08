@@ -59,6 +59,15 @@ public class ObraBean implements GenericBean {
         this.id = id;
     }
 
+    public ObraBean(Integer id_compositor, Boolean flag) {
+        this.id_compositor = id_compositor;
+    }
+    
+    public ObraBean(Integer id, Integer id_compositor, Boolean flag) {
+        this.id = id;
+        this.id_compositor = id_compositor;
+    }
+
     public Integer getId() {
         return id;
     }
@@ -118,6 +127,16 @@ public class ObraBean implements GenericBean {
         return strColumns;
     }
 
+    public String getColumnsXCompositor() {
+        String strColumns = "";
+        strColumns += "id,";
+        strColumns += "titulo,";
+        strColumns += "subtitulo,";
+        strColumns += "notas";
+//        strColumns += "id_compositor";
+        return strColumns;
+    }
+
     @Override
     public String getValues() {
         String strColumns = "";
@@ -129,13 +148,20 @@ public class ObraBean implements GenericBean {
         return strColumns;
     }
 
+    public String getValuesXCompositor(Integer idCompositor) {
+        String strColumns = "";
+        strColumns += id + ",";
+        strColumns += EncodingUtilHelper.quotate(titulo) + ",";
+        strColumns += EncodingUtilHelper.quotate(subtitulo) + ",";
+        strColumns += EncodingUtilHelper.quotate(notas) + ",";
+        strColumns += idCompositor;
+        return strColumns;
+    }
+
     @Override
     public String toPairs() {
         String strPairs = "";
-//        strPairs += "titulo=" + EncodingUtilHelper.quotate(titulo) + ",";
-//        strPairs += "subtitulo=" + EncodingUtilHelper.quotate(subtitulo) + ",";
-//        strPairs += "notas=" + EncodingUtilHelper.quotate(notas) + ",";
-//        strPairs += "id_compositor=" + id_compositor;
+        // Añadido para comprobar si existen parámtros y poner las , de separación
         Boolean hay = false;
         if (titulo != null) {
             strPairs += "titulo=" + EncodingUtilHelper.quotate(titulo);
@@ -158,13 +184,36 @@ public class ObraBean implements GenericBean {
         return strPairs;
     }
 
+    public String toPairsXCompositor(Integer idCompositor) {
+        String strPairs = "";
+        Boolean hay = false;
+        if (titulo != null) {
+            strPairs += "titulo=" + EncodingUtilHelper.quotate(titulo);
+            hay = true;
+        }
+        if (subtitulo != null) {
+            strPairs += (hay) ? ",subtitulo=" : "subtitulo=";
+            strPairs += EncodingUtilHelper.quotate(subtitulo);
+            hay = true;
+        }
+        if (notas != null) {
+            strPairs += (hay) ? ",notas=" : "notas=";
+            strPairs += EncodingUtilHelper.quotate(notas);
+            hay = true;
+        }
+//        strPairs += (hay) ? ",id_compositor=" : "id_compositor=";
+//        strPairs += idCompositor;
+
+        return strPairs;
+    }
+
     @Override
     public ObraBean fill(ResultSet oResultSet, Connection pooledConnection, PusuarioBean oPuserBean_security, Integer expand) throws SQLException, Exception {
         this.setId(oResultSet.getInt("id"));
         this.setTitulo(oResultSet.getString("titulo"));
         this.setSubtitulo(oResultSet.getString("subtitulo"));
         this.setNotas(oResultSet.getString("notas"));
-        
+
         if (expand > 0) {
             CompositorBean oCompositorBean = new CompositorBean();
             CompositorDao oCompositorDao = new CompositorDao(pooledConnection, oPuserBean_security, null);
@@ -174,7 +223,7 @@ public class ObraBean implements GenericBean {
         } else {
             this.setId_compositor(oResultSet.getInt("id_compositor"));
         }
-        
+
         return this;
     }
 }

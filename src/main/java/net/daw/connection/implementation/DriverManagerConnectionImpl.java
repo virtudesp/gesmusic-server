@@ -60,7 +60,10 @@ public class DriverManagerConnectionImpl implements ConnectionInterface {
 //
 //http://localhost:8081/gesmusic-server/json?ob=rol&op=getpage&page=2&10
 //
-//http://localhost:8081/gesmusic-server/json?ob=obra&op=getPageXCompositor&id=3&page=2&10
+//http://localhost:8081/gesmusic-server/json?ob=obra&op=getpage&foreign=3&page=1&rpp=10
+//
+//http://localhost:8081/gesmusic-server/json?ob=obra&op=set&foreign=7&json={"titulo":"Habia una vez"}
+//http://localhost:8081/gesmusic-server/json?ob=obra&op=set&id=18&foreign=7&json={"id":"17","subtitulo":"pasodoble"}
 //
 //http://localhost:8081/gesmusic-server/json?ob=tipousuario&op=get&id=2
 //
@@ -74,3 +77,6 @@ public class DriverManagerConnectionImpl implements ConnectionInterface {
 
 //ob=miembro&op=remove&id=63
 //ALTER TABLE participa DROP FOREIGN KEY fk_participa_acto1;
+
+
+//json?ob=obra&op=getcount&id=7
