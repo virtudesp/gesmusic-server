@@ -47,6 +47,7 @@ public class UsuarioDao implements ViewDaoInterface<UsuarioBean>, TableDaoInterf
 
     private String strTable = "usuario";
     private String strSQL = "select * from usuario where 1=1 ";
+    private String strSQLCount = "SELECT COUNT(*) FROM " + strTable + " WHERE 1=1 ";
     private MysqlData oMysql = null;
     private Connection oConnection = null;
     private PusuarioBean oPuserSecurity = null;
@@ -67,10 +68,25 @@ public class UsuarioDao implements ViewDaoInterface<UsuarioBean>, TableDaoInterf
 
     @Override
     public Long getCount(ArrayList<FilterBeanHelper> hmFilter) throws Exception {
-        strSQL += SqlBuilder.buildSqlWhere(hmFilter);
+        strSQLCount += SqlBuilder.buildSqlWhere(hmFilter);
         Long pages = 0L;
         try {
-            pages = oMysql.getCount(strSQL);
+            pages = oMysql.getCount(strSQLCount);
+        } catch (Exception ex) {
+            Log4j.errorLog(this.getClass().getName() + ":" + (ex.getStackTrace()[0]).getMethodName(), ex);
+            throw new Exception();
+        }
+        return pages;
+    }
+
+    // Para la relación tipousuario:usuario -- 1:N
+    public Long getCountXTipousuario(int idTipousuario, ArrayList<FilterBeanHelper> hmFilter) throws Exception {
+        // definir la nueva condición de la sql
+        strSQLCount += " and id_tipousuario= " + idTipousuario + " ";
+        strSQLCount += SqlBuilder.buildSqlWhere(hmFilter);
+        Long pages = 0L;
+        try {
+            pages = oMysql.getCount(strSQLCount);
         } catch (Exception ex) {
             Log4j.errorLog(this.getClass().getName() + ":" + (ex.getStackTrace()[0]).getMethodName(), ex);
             throw new Exception();
@@ -82,7 +98,35 @@ public class UsuarioDao implements ViewDaoInterface<UsuarioBean>, TableDaoInterf
     public ArrayList<UsuarioBean> getPage(int intRegsPerPag, int intPage, ArrayList<FilterBeanHelper> alFilter, HashMap<String, String> hmOrder, Integer expand) throws Exception {
         strSQL += SqlBuilder.buildSqlWhere(alFilter);
         strSQL += SqlBuilder.buildSqlOrder(hmOrder);
-        strSQL += SqlBuilder.buildSqlLimit(oMysql.getCount(strSQL), intRegsPerPag, intPage);
+        strSQL += SqlBuilder.buildSqlLimit(oMysql.getCount(strSQLCount), intRegsPerPag, intPage);
+        ArrayList<UsuarioBean> arrUser = new ArrayList<>();
+        ResultSet oResultSet = null;
+        try {
+            oResultSet = oMysql.getAllSQL(strSQL);
+            while (oResultSet.next()) {
+                UsuarioBean oUserBean = new UsuarioBean();
+                arrUser.add((UsuarioBean) oUserBean.fill(oResultSet, oConnection, oPuserSecurity, expand));
+            }
+            if (oResultSet != null) {
+                oResultSet.close();
+            }
+        } catch (Exception ex) {
+            Log4j.errorLog(this.getClass().getName() + ":" + (ex.getStackTrace()[0]).getMethodName(), ex);
+            throw new Exception();
+        } finally {
+            if (oResultSet != null) {
+                oResultSet.close();
+            }
+        }
+        return arrUser;
+    }
+    public ArrayList<UsuarioBean> getPageXTipousuario(int idTipousuario, int intRegsPerPag, int intPage, ArrayList<FilterBeanHelper> alFilter, HashMap<String, String> hmOrder, Integer expand) throws Exception {
+        // definir la nueva condición de la sql
+        strSQLCount += " and id_tipousuario= " + idTipousuario + " ";   
+        strSQL += " and id_tipousuario= " + idTipousuario + " ";        
+        strSQL += SqlBuilder.buildSqlWhere(alFilter);        
+        strSQL += SqlBuilder.buildSqlOrder(hmOrder);
+        strSQL += SqlBuilder.buildSqlLimit(oMysql.getCount(strSQLCount), intRegsPerPag, intPage);
         ArrayList<UsuarioBean> arrUser = new ArrayList<>();
         ResultSet oResultSet = null;
         try {
@@ -107,6 +151,31 @@ public class UsuarioDao implements ViewDaoInterface<UsuarioBean>, TableDaoInterf
 
     @Override
     public ArrayList<UsuarioBean> getAll(ArrayList<FilterBeanHelper> alFilter, HashMap<String, String> hmOrder, Integer expand) throws Exception {
+        strSQL += SqlBuilder.buildSqlWhere(alFilter);
+        strSQL += SqlBuilder.buildSqlOrder(hmOrder);
+        ArrayList<UsuarioBean> arrUser = new ArrayList<>();
+        ResultSet oResultSet = null;
+        try {
+            oResultSet = oMysql.getAllSQL(strSQL);
+            while (oResultSet.next()) {
+                UsuarioBean oUserBean = new UsuarioBean();
+                arrUser.add((UsuarioBean) oUserBean.fill(oResultSet, oConnection, oPuserSecurity, expand));
+            }
+        } catch (Exception ex) {
+            Log4j.errorLog(this.getClass().getName() + ":" + (ex.getStackTrace()[0]).getMethodName(), ex);
+            throw new Exception();
+        } finally {
+            if (oResultSet != null) {
+                oResultSet.close();
+            }
+        }
+        return arrUser;
+    }
+    
+    // Para obtener todos los usuarios de un tipousuario
+    public ArrayList<UsuarioBean> getAllXTipousuario(int idTipousuario, ArrayList<FilterBeanHelper> alFilter, HashMap<String, String> hmOrder, Integer expand) throws Exception {
+        // definir la nueva condición de la sql
+        strSQL += " and id_tipousuario= " + idTipousuario + " ";
         strSQL += SqlBuilder.buildSqlWhere(alFilter);
         strSQL += SqlBuilder.buildSqlOrder(hmOrder);
         ArrayList<UsuarioBean> arrUser = new ArrayList<>();
@@ -169,6 +238,28 @@ public class UsuarioDao implements ViewDaoInterface<UsuarioBean>, TableDaoInterf
                 strSQL = "UPDATE " + strTable + " ";
                 strSQL += " SET " + oUserBean.toPairs();
                 strSQL += " WHERE id=" + oUserBean.getId();
+                iResult = oMysql.executeUpdateSQL(strSQL);
+            }
+        } catch (Exception ex) {
+            Log4j.errorLog(this.getClass().getName() + ":" + (ex.getStackTrace()[0]).getMethodName(), ex);
+            throw new Exception();
+        }
+        return iResult;
+    }
+    
+    // Dado un tipousuario, crear un nuevo usuario o modificar uno ya existente
+    public Integer setXTipousuario(UsuarioBean oUsuarioBean, Integer idTipousuario) throws Exception {
+        Integer iResult = null;
+        try {
+            if (oUsuarioBean.getId() == 0) {
+                strSQL = "INSERT INTO " + strTable + " ";
+                strSQL += "(" + oUsuarioBean.getColumns() + ")";
+                strSQL += "VALUES(" + oUsuarioBean.getValuesXTipousuario(idTipousuario) + ")";
+                iResult = oMysql.executeInsertSQL(strSQL);
+            } else {
+                strSQL = "UPDATE " + strTable;
+                strSQL += " SET " + oUsuarioBean.toPairsXTipousuario(idTipousuario);
+                strSQL += " WHERE id=" + oUsuarioBean.getId();
                 iResult = oMysql.executeUpdateSQL(strSQL);
             }
         } catch (Exception ex) {

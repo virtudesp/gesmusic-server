@@ -178,15 +178,22 @@ public class MysqlData implements DataInterface {
     }
 
     @Override
-    public Long getCount(String strSqlSelectDataOrigin) throws Exception {
+//    public Long getCount(String strSqlSelectDataOrigin) throws Exception {
+    public Long getCount(String strSqlCount) throws Exception {
         Long longResult = 0L;
         Statement oStatement = null;
         ResultSet oResultSet = null;
         try {
             oStatement = (Statement) connection.createStatement();
-            String strNewSqlDataSource = "SELECT COUNT(*) " + strSqlSelectDataOrigin.substring(strSqlSelectDataOrigin.toLowerCase().indexOf("from"), strSqlSelectDataOrigin.length());
+//            String strNewSqlDataSource = "SELECT COUNT(*) " + strSqlSelectDataOrigin.substring(strSqlSelectDataOrigin.toLowerCase().indexOf("from"), strSqlSelectDataOrigin.length());
+//SELECT *, (SELECT count(*) FROM obra WHERE id_compositor = compositor.id) AS total FROM compositor where 1=1             
+//SELECT COUNT(*) FROM obra WHERE id_compositor = compositor.id) AS total FROM compositor where 1=1 
+//select * from compositor where 1=1 
+//SELECT COUNT(*) from compositor where 1=1             
+            
             oStatement = (Statement) connection.createStatement();
-            oResultSet = oStatement.executeQuery(strNewSqlDataSource);
+//            oResultSet = oStatement.executeQuery(strNewSqlDataSource);
+            oResultSet = oStatement.executeQuery(strSqlCount);
             while (oResultSet.next()) {
                 longResult = oResultSet.getLong("COUNT(*)");
             }

@@ -229,22 +229,16 @@ public class TipomiembroService implements TableServiceInterface, ViewServiceInt
     @Override
     public ReplyBean set() throws Exception {
         if (this.checkpermission("set")) {
-            String jason = ParameterCook.prepareJson(oRequest);
-            // Se necesita el id para diferenciar un insert de un update enviando como parámetro where al crear oMiembroBean 
+            String jason = ParameterCook.prepareJson(oRequest); 
             JsonParser parser = new JsonParser();
             JsonElement elementObject = parser.parse(jason);
-            String strRequestId;
-            try{
-                strRequestId = elementObject.getAsJsonObject().get("id").getAsString();
-            } catch (Exception e){
-                strRequestId = "0";
-            }
-            Integer requestId = Integer.parseInt(strRequestId);
+            // Se necesita el id para diferenciar un insert de un update enviando como parámetro where al crear oMiembroBean
+            Integer id = ParameterCook.prepareId(oRequest);
             String where = "";
-            if (requestId == 0) {
+            if (id == 0) {
                 where = null;
             } else {
-                where += " where id=" + requestId;
+                where += " where id=" + id;
             }
             // hasta aquí lo que he añadido yo
             ReplyBean oReplyBean = new ReplyBean();
@@ -258,10 +252,10 @@ public class TipomiembroService implements TableServiceInterface, ViewServiceInt
 //                TipomiembroBean oUsertypeBean = new TipomiembroBean();
                 TipomiembroDao oUsertypeDao = new TipomiembroDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), where);
                 TipomiembroBean oUsertypeBean;
-                if (requestId == 0) {
+                if (id == 0) {
                     oUsertypeBean = new TipomiembroBean();
                 } else {
-                    oUsertypeBean = new TipomiembroBean(requestId);
+                    oUsertypeBean = new TipomiembroBean(id);
                 }
                 oUsertypeBean = AppConfigurationHelper.getGson().fromJson(jason, oUsertypeBean.getClass());
                 if (oUsertypeBean != null) {

@@ -41,7 +41,8 @@ public class TipousuarioBean implements GenericBean {
     private Integer id = 0;
     @Expose
     private String tipousuario;
-
+    @Expose
+    private Integer total = 1; // Si un tipousuario está en la bbdd es porque al menos hay un usuario de ese tipo
 
     public TipousuarioBean() {
     }
@@ -65,12 +66,21 @@ public class TipousuarioBean implements GenericBean {
     public void setTipousuario(String tipousuario) {
         this.tipousuario = tipousuario;
     }
+    
+    public Integer getTotal() {
+        return total;
+    }
+
+    public void setTotal(Integer total) {
+        this.total = total;
+    }
 
     @Override
     public String getColumns() {
         String strColumns = "";
         strColumns += "id,";
-        strColumns += "tipousuario";
+        strColumns += "tipousuario";//,";
+//        strColumns += "total";
         return strColumns;
     }
 
@@ -78,14 +88,24 @@ public class TipousuarioBean implements GenericBean {
     public String getValues() {
         String strColumns = "";
         strColumns += id + ",";
-        strColumns += EncodingUtilHelper.quotate(tipousuario);
+        strColumns += EncodingUtilHelper.quotate(tipousuario);// + ",";
+//        strColumns += total;
         return strColumns;
     }
 
     @Override
     public String toPairs() {
-        String strPairs = "";
-        strPairs += "tipousuario=" + EncodingUtilHelper.quotate(tipousuario);
+        String strPairs = "";     
+        Boolean hay = false;
+//        strPairs += "tipousuario=" + EncodingUtilHelper.quotate(tipousuario);
+        if (tipousuario != null) {
+            strPairs += "tipousuario=" + EncodingUtilHelper.quotate(tipousuario);
+//            hay = true;
+        }
+//        if (total != null) {
+//            strPairs += (hay) ? ",total=" : "total=";
+//            strPairs += total;            
+//        }
         return strPairs;
     }
 
@@ -93,6 +113,7 @@ public class TipousuarioBean implements GenericBean {
     public TipousuarioBean fill(ResultSet oResultSet, Connection pooledConnection, PusuarioBean oPuserBean_security, Integer expand) throws SQLException, Exception {
         this.setId(oResultSet.getInt("id"));
         this.setTipousuario(oResultSet.getString("tipousuario"));
+        this.setTotal(oResultSet.getInt("total"));
         return this;
     }
 

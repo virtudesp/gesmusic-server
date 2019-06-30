@@ -59,6 +59,7 @@ public class ObraBean implements GenericBean {
         this.id = id;
     }
 
+    //Nuevos constructores para las relaciones 1:N
     public ObraBean(Integer id_compositor, Boolean flag) {
         this.id_compositor = id_compositor;
     }

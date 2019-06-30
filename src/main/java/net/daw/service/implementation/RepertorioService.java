@@ -70,6 +70,8 @@ public class RepertorioService implements TableServiceInterface, ViewServiceInte
     @Override
     public ReplyBean getcount() throws Exception {
         if (this.checkpermission("getcount")) {
+            // parámetro añadido
+            int idActo = ParameterCook.prepareId(oRequest);
             String data = null;
             ArrayList<FilterBeanHelper> alFilter = ParameterCook.getFilterParams(ParameterCook.prepareFilter(oRequest));
             Connection oConnection = null;
@@ -78,7 +80,13 @@ public class RepertorioService implements TableServiceInterface, ViewServiceInte
                 oDataConnectionSource = getSourceConnection();
                 oConnection = oDataConnectionSource.newConnection();
                 RepertorioDao oRepertorioDao = new RepertorioDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), null);
-                data = JsonMessage.getJsonExpression(200, Long.toString(oRepertorioDao.getCount(alFilter)));
+                /* Si no hay idActo se cuentan todos los registros de la tabla.
+                   Si hay idActo se cuentan los registros de ese acto */
+                if (idActo == 0) {
+                    data = JsonMessage.getJsonExpression(200, Long.toString(oRepertorioDao.getCount(alFilter)));
+                } else {
+                    data = JsonMessage.getJsonExpression(200, Long.toString(oRepertorioDao.getCountXActo(idActo, alFilter)));
+                }
             } catch (Exception ex) {
                 Log4j.errorLog(this.getClass().getName() + ":" + (ex.getStackTrace()[0]).getMethodName(), ex);
                 throw new Exception();
@@ -131,6 +139,8 @@ public class RepertorioService implements TableServiceInterface, ViewServiceInte
     @Override
     public ReplyBean getall() throws Exception {
         if (this.checkpermission("getall")) {
+            // parámetro añadido
+            int idActo = ParameterCook.prepareForeignId(oRequest);
             HashMap<String, String> hmOrder = ParameterCook.getOrderParams(ParameterCook.prepareOrder(oRequest));
             ArrayList<FilterBeanHelper> alFilter = ParameterCook.getFilterParams(ParameterCook.prepareFilter(oRequest));
             String data = null;
@@ -140,7 +150,14 @@ public class RepertorioService implements TableServiceInterface, ViewServiceInte
                 oDataConnectionSource = getSourceConnection();
                 oConnection = oDataConnectionSource.newConnection();
                 RepertorioDao oRepertorioDao = new RepertorioDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), null);
-                ArrayList<RepertorioBean> arrBeans = oRepertorioDao.getAll(alFilter, hmOrder, AppConfigurationHelper.getJsonMsgDepth());
+                // Si no hay idActo obtiene todos los registros de repertorio y si hay idActo, sólo los de ese acto
+                ArrayList<RepertorioBean> arrBeans;
+                if (idActo == 0) {
+                    arrBeans = oRepertorioDao.getAll(alFilter, hmOrder, AppConfigurationHelper.getJsonMsgDepth());
+                } else {
+                    arrBeans = oRepertorioDao.getAllXActo(idActo, alFilter, hmOrder, AppConfigurationHelper.getJsonMsgDepth());
+                }
+                data = JsonMessage.getJsonExpression(200, AppConfigurationHelper.getGson().toJson(arrBeans));
                 data = JsonMessage.getJsonExpression(200, AppConfigurationHelper.getGson().toJson(arrBeans));
             } catch (Exception ex) {
                 Log4j.errorLog(this.getClass().getName() + ":" + (ex.getStackTrace()[0]).getMethodName(), ex);
@@ -162,6 +179,8 @@ public class RepertorioService implements TableServiceInterface, ViewServiceInte
     @Override
     public ReplyBean getpage() throws Exception {
         if (this.checkpermission("getpage")) {
+            // parámetro añadido
+            int idActo = ParameterCook.prepareId(oRequest);
             int intRegsPerPag = ParameterCook.prepareRpp(oRequest);
             int intPage = ParameterCook.preparePage(oRequest);
             HashMap<String, String> hmOrder = ParameterCook.getOrderParams(ParameterCook.prepareOrder(oRequest));
@@ -173,7 +192,13 @@ public class RepertorioService implements TableServiceInterface, ViewServiceInte
                 oDataConnectionSource = getSourceConnection();
                 oConnection = oDataConnectionSource.newConnection();
                 RepertorioDao oRepertorioDao = new RepertorioDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), null);
-                List<RepertorioBean> arrBeans = oRepertorioDao.getPage(intRegsPerPag, intPage, alFilter, hmOrder, AppConfigurationHelper.getJsonMsgDepth());
+                // Si no hay idActo el método es general y si hay idActo es para ese acto
+                List<RepertorioBean> arrBeans;
+                if (idActo == 0) {
+                    arrBeans = oRepertorioDao.getPage(intRegsPerPag, intPage, alFilter, hmOrder, AppConfigurationHelper.getJsonMsgDepth());
+                } else {
+                    arrBeans = oRepertorioDao.getPageXActo(idActo, intRegsPerPag, intPage, alFilter, hmOrder, AppConfigurationHelper.getJsonMsgDepth());
+                }
                 data = JsonMessage.getJsonExpression(200, AppConfigurationHelper.getGson().toJson(arrBeans));
             } catch (Exception ex) {
                 Log4j.errorLog(this.getClass().getName() + ":" + (ex.getStackTrace()[0]).getMethodName(), ex);

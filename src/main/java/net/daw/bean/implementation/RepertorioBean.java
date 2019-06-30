@@ -35,6 +35,7 @@ import java.sql.SQLException;
 import net.daw.bean.publicinterface.GenericBean;
 import net.daw.dao.implementation.ObraDao;
 import net.daw.dao.implementation.ActoDao;
+import net.daw.dao.implementation.AgrupacionDao;
 //import net.daw.helper.statics.EncodingUtilHelper;
 
 public class RepertorioBean implements GenericBean {
@@ -51,6 +52,11 @@ public class RepertorioBean implements GenericBean {
     private Integer id_acto;
     @Expose(deserialize = false)
     private ActoBean obj_acto = null;
+    
+    @Expose(serialize = false)
+    private Integer id_agrupacion;
+    @Expose(deserialize = false)
+    private AgrupacionBean obj_agrupacion = null;
 
     public RepertorioBean() {
     }
@@ -99,13 +105,29 @@ public class RepertorioBean implements GenericBean {
         this.obj_acto = obj_acto;
     }
 
+    public Integer getId_agrupacion() {
+        return id_agrupacion;
+    }
+
+    public void setId_agrupacion(Integer id_agrupacion) {
+        this.id_agrupacion = id_agrupacion;
+    }
+
+    public AgrupacionBean getObj_agrupacion() {
+        return obj_agrupacion;
+    }
+
+    public void setObj_agrupacion(AgrupacionBean obj_agrupacion) {
+        this.obj_agrupacion = obj_agrupacion;
+    }
 
     @Override
     public String getColumns() {
         String strColumns = "";
         strColumns += "id,";
         strColumns += "id_obra,";
-        strColumns += "id_acto";
+        strColumns += "id_acto,";
+        strColumns += "id_agrupacion";
         return strColumns;
     }
 
@@ -114,7 +136,8 @@ public class RepertorioBean implements GenericBean {
         String strColumns = "";
         strColumns += id + ",";
         strColumns += id_obra + ",";
-        strColumns += id_acto;
+        strColumns += id_acto + ",";
+        strColumns += id_agrupacion;
         return strColumns;
     }
 
@@ -131,6 +154,11 @@ public class RepertorioBean implements GenericBean {
         if (id_acto != null) {
             strPairs += (hay) ? ",id_acto=" : "id_acto=";
             strPairs += id_acto;
+            hay = true;
+        }
+        if (id_agrupacion != null) {
+            strPairs += (hay) ? ",id_agrupacion=" : "id_agrupacion=";
+            strPairs += id_agrupacion;
         }
         return strPairs;
     }
@@ -157,6 +185,16 @@ public class RepertorioBean implements GenericBean {
             this.setObj_acto(oActoBean);
         } else {
             this.setId_acto(oResultSet.getInt("id_acto"));
+        }
+
+        if (expand > 0) {
+            AgrupacionBean oAgrupacionBean = new AgrupacionBean();
+            AgrupacionDao oAgrupacionDao = new AgrupacionDao(pooledConnection, oPusuarioBean_security, null);
+            oAgrupacionBean.setId(oResultSet.getInt("id_agrupacion"));
+            oAgrupacionBean = oAgrupacionDao.get(oAgrupacionBean, expand - 1);
+            this.setObj_agrupacion(oAgrupacionBean);
+        } else {
+            this.setId_agrupacion(oResultSet.getInt("id_agrupacion"));
         }
 
         return this;

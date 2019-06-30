@@ -43,14 +43,14 @@ public class ParticipaBean implements GenericBean {
     private Integer id = 0;
     
     @Expose(serialize = false)
-    private Integer id_agrupacion;
-    @Expose(deserialize = false)
-    private AgrupacionBean obj_agrupacion = null;
-    
-    @Expose(serialize = false)
     private Integer id_acto;
     @Expose(deserialize = false)
     private ActoBean obj_acto = null;
+    
+    @Expose(serialize = false)
+    private Integer id_agrupacion;
+    @Expose(deserialize = false)
+    private AgrupacionBean obj_agrupacion = null;
 
     public ParticipaBean() {
     }
@@ -104,8 +104,8 @@ public class ParticipaBean implements GenericBean {
     public String getColumns() {
         String strColumns = "";
         strColumns += "id,";
-        strColumns += "id_agrupacion,";
-        strColumns += "id_acto";
+        strColumns += "id_acto,";
+        strColumns += "id_agrupacion";
         return strColumns;
     }
 
@@ -113,8 +113,8 @@ public class ParticipaBean implements GenericBean {
     public String getValues() {
         String strColumns = "";
         strColumns += id + ",";
-        strColumns += id_agrupacion + ",";
-        strColumns += id_acto;
+        strColumns += id_acto + ",";
+        strColumns += id_agrupacion;
         return strColumns;
     }
 
@@ -124,12 +124,12 @@ public class ParticipaBean implements GenericBean {
 //        strPairs += "id_agrupacion=" + id_agrupacion + ",";
 //        strPairs += "id_acto=" + id_acto;
         Boolean hay = false;
-        if (id_agrupacion != null) {
-            strPairs += "id_agrupacion=" + id_agrupacion;
+        if (id_acto != null) {
+            strPairs += "id_acto=" + id_acto;
             hay = true;
         }
-        if (id_acto != null) {
-            strPairs += (hay) ? ",id_acto=" : "id_acto=";
+        if (id_agrupacion != null) {
+            strPairs += (hay) ? ",id_agrupacion=" : "id_agrupacion=";
             strPairs += id_acto;
         }
         return strPairs;
@@ -140,16 +140,6 @@ public class ParticipaBean implements GenericBean {
         this.setId(oResultSet.getInt("id"));
 
         if (expand > 0) {
-            AgrupacionBean oAgrupacionBean = new AgrupacionBean();
-            AgrupacionDao oAgrupacionDao = new AgrupacionDao(pooledConnection, oPusuarioBean_security, null);
-            oAgrupacionBean.setId(oResultSet.getInt("id_agrupacion"));
-            oAgrupacionBean = oAgrupacionDao.get(oAgrupacionBean, expand - 1);
-            this.setObj_agrupacion(oAgrupacionBean);
-        } else {
-            this.setId_agrupacion(oResultSet.getInt("id_agrupacion"));
-        }
-
-        if (expand > 0) {
             ActoBean oActoBean = new ActoBean();
             ActoDao oActoDao = new ActoDao(pooledConnection, oPusuarioBean_security, null);
             oActoBean.setId(oResultSet.getInt("id_acto"));
@@ -157,6 +147,16 @@ public class ParticipaBean implements GenericBean {
             this.setObj_acto(oActoBean);
         } else {
             this.setId_acto(oResultSet.getInt("id_acto"));
+        }
+
+        if (expand > 0) {
+            AgrupacionBean oAgrupacionBean = new AgrupacionBean();
+            AgrupacionDao oAgrupacionDao = new AgrupacionDao(pooledConnection, oPusuarioBean_security, null);
+            oAgrupacionBean.setId(oResultSet.getInt("id_agrupacion"));
+            oAgrupacionBean = oAgrupacionDao.get(oAgrupacionBean, expand - 1);
+            this.setObj_agrupacion(oAgrupacionBean);
+        } else {
+            this.setId_agrupacion(oResultSet.getInt("id_agrupacion"));
         }
 
         return this;

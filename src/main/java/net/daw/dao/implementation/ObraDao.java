@@ -47,6 +47,7 @@ public class ObraDao implements ViewDaoInterface<ObraBean>, TableDaoInterface<Ob
 
     private String strTable = "obra";
     private String strSQL = "select * from obra where 1=1 ";
+    private String strSQLCount = "SELECT COUNT(*) FROM " + strTable + " WHERE 1=1 ";
     private MysqlData oMysql = null;
     private Connection oConnection = null;
     private PusuarioBean oPuserSecurity = null;
@@ -67,10 +68,10 @@ public class ObraDao implements ViewDaoInterface<ObraBean>, TableDaoInterface<Ob
 
     @Override
     public Long getCount(ArrayList<FilterBeanHelper> hmFilter) throws Exception {
-        strSQL += SqlBuilder.buildSqlWhere(hmFilter);
+        strSQLCount += SqlBuilder.buildSqlWhere(hmFilter);
         Long pages = 0L;
         try {
-            pages = oMysql.getCount(strSQL);
+            pages = oMysql.getCount(strSQLCount);
         } catch (Exception ex) {
             Log4j.errorLog(this.getClass().getName() + ":" + (ex.getStackTrace()[0]).getMethodName(), ex);
             throw new Exception();
@@ -78,25 +79,26 @@ public class ObraDao implements ViewDaoInterface<ObraBean>, TableDaoInterface<Ob
         return pages;
     }
     
+    // Para la relación compositor --> obras
     public Long getCountXCompositor(int idCompositor, ArrayList<FilterBeanHelper> hmFilter) throws Exception {
         // definir la nueva condición de la sql
-        strSQL += " and id_compositor= " + idCompositor + " "; 
-        strSQL += SqlBuilder.buildSqlWhere(hmFilter);
+        strSQLCount += " and id_compositor= " + idCompositor + " "; 
+        strSQLCount += SqlBuilder.buildSqlWhere(hmFilter);
         Long pages = 0L;
         try {
-            pages = oMysql.getCount(strSQL);
+            pages = oMysql.getCount(strSQLCount);
         } catch (Exception ex) {
             Log4j.errorLog(this.getClass().getName() + ":" + (ex.getStackTrace()[0]).getMethodName(), ex);
             throw new Exception();
         }
         return pages;
     }
-
+    
     @Override
     public ArrayList<ObraBean> getPage(int intRegsPerPag, int intPage, ArrayList<FilterBeanHelper> alFilter, HashMap<String, String> hmOrder, Integer expand) throws Exception {
         strSQL += SqlBuilder.buildSqlWhere(alFilter);
         strSQL += SqlBuilder.buildSqlOrder(hmOrder);
-        strSQL += SqlBuilder.buildSqlLimit(oMysql.getCount(strSQL), intRegsPerPag, intPage);
+        strSQL += SqlBuilder.buildSqlLimit(oMysql.getCount(strSQLCount), intRegsPerPag, intPage);
         ArrayList<ObraBean> arrUser = new ArrayList<>();
         ResultSet oResultSet = null;
         try {
@@ -121,10 +123,11 @@ public class ObraDao implements ViewDaoInterface<ObraBean>, TableDaoInterface<Ob
 
     public ArrayList<ObraBean> getPageXCompositor(int idCompositor, int intRegsPerPag, int intPage, ArrayList<FilterBeanHelper> alFilter, HashMap<String, String> hmOrder, Integer expand) throws Exception {
         // definir la nueva condición de la sql
+        strSQLCount += " and id_compositor= " + idCompositor + " ";  
         strSQL += " and id_compositor= " + idCompositor + " ";        
         strSQL += SqlBuilder.buildSqlWhere(alFilter);        
         strSQL += SqlBuilder.buildSqlOrder(hmOrder);
-        strSQL += SqlBuilder.buildSqlLimit(oMysql.getCount(strSQL), intRegsPerPag, intPage);
+        strSQL += SqlBuilder.buildSqlLimit(oMysql.getCount(strSQLCount), intRegsPerPag, intPage);
         ArrayList<ObraBean> arrUser = new ArrayList<>();
         ResultSet oResultSet = null;
         try {
@@ -244,6 +247,7 @@ public class ObraDao implements ViewDaoInterface<ObraBean>, TableDaoInterface<Ob
         }
         return iResult;
     }
+    
     // Dado un compositor, crear una nueva obra o modificar una ya existente
     public Integer setXCompositor(ObraBean oObraBean, Integer idCompositor) throws Exception {
         Integer iResult = null;

@@ -22,6 +22,7 @@ public class MiembroDao implements ViewDaoInterface<MiembroBean>, TableDaoInterf
 
     private String strTable = "miembro";
     private String strSQL = "select * from " + strTable + " where 1=1 ";
+    private String strSQLCount = "SELECT COUNT(*) FROM " + strTable + " WHERE 1=1 ";
     private MysqlData oMysql = null;
     private Connection oConnection = null;
     private PusuarioBean oPuserSecurity = null;
@@ -42,10 +43,25 @@ public class MiembroDao implements ViewDaoInterface<MiembroBean>, TableDaoInterf
 
     @Override
     public Long getCount(ArrayList<FilterBeanHelper> hmFilter) throws Exception {
-        strSQL += SqlBuilder.buildSqlWhere(hmFilter);
+        strSQLCount += SqlBuilder.buildSqlWhere(hmFilter);
         Long pages = 0L;
         try {
-            pages = oMysql.getCount(strSQL);
+            pages = oMysql.getCount(strSQLCount);
+        } catch (Exception ex) {
+            Log4j.errorLog(this.getClass().getName() + ":" + (ex.getStackTrace()[0]).getMethodName(), ex);
+            throw new Exception();
+        }
+        return pages;
+    }
+
+    // Para la relación tipomiembro:miembro -- 1:N
+    public Long getCountXTipomiembro(int idTipomiembro, ArrayList<FilterBeanHelper> hmFilter) throws Exception {
+        // definir la nueva condición de la sql
+        strSQLCount += " and id_tipomiembro= " + idTipomiembro + " ";
+        strSQLCount += SqlBuilder.buildSqlWhere(hmFilter);
+        Long pages = 0L;
+        try {
+            pages = oMysql.getCount(strSQLCount);
         } catch (Exception ex) {
             Log4j.errorLog(this.getClass().getName() + ":" + (ex.getStackTrace()[0]).getMethodName(), ex);
             throw new Exception();
@@ -57,7 +73,7 @@ public class MiembroDao implements ViewDaoInterface<MiembroBean>, TableDaoInterf
     public ArrayList<MiembroBean> getPage(int intRegsPerPag, int intPage, ArrayList<FilterBeanHelper> alFilter, HashMap<String, String> hmOrder, Integer expand) throws Exception {
         strSQL += SqlBuilder.buildSqlWhere(alFilter);
         strSQL += SqlBuilder.buildSqlOrder(hmOrder);
-        strSQL += SqlBuilder.buildSqlLimit(oMysql.getCount(strSQL), intRegsPerPag, intPage);
+        strSQL += SqlBuilder.buildSqlLimit(oMysql.getCount(strSQLCount), intRegsPerPag, intPage);
         ArrayList<MiembroBean> arrMiembro = new ArrayList<>();
         ResultSet oResultSet = null;
         try {
@@ -80,6 +96,35 @@ public class MiembroDao implements ViewDaoInterface<MiembroBean>, TableDaoInterf
         return arrMiembro;
     }
 
+    public ArrayList<MiembroBean> getPageXTipomiembro(int id_tipomiembro, int intRegsPerPag, int intPage, ArrayList<FilterBeanHelper> alFilter, HashMap<String, String> hmOrder, Integer expand) throws Exception {
+        // definir la nueva condición de la sql
+        strSQLCount += " and id_tipomiembro= " + id_tipomiembro + " ";   
+        strSQL += " and id_tipomiembro= " + id_tipomiembro + " ";        
+        strSQL += SqlBuilder.buildSqlWhere(alFilter);        
+        strSQL += SqlBuilder.buildSqlOrder(hmOrder);
+        strSQL += SqlBuilder.buildSqlLimit(oMysql.getCount(strSQLCount), intRegsPerPag, intPage);
+        ArrayList<MiembroBean> arrUser = new ArrayList<>();
+        ResultSet oResultSet = null;
+        try {
+            oResultSet = oMysql.getAllSQL(strSQL);
+            while (oResultSet.next()) {
+                MiembroBean oUserBean = new MiembroBean();
+                arrUser.add((MiembroBean) oUserBean.fill(oResultSet, oConnection, oPuserSecurity, expand));
+            }
+            if (oResultSet != null) {
+                oResultSet.close();
+            }
+        } catch (Exception ex) {
+            Log4j.errorLog(this.getClass().getName() + ":" + (ex.getStackTrace()[0]).getMethodName(), ex);
+            throw new Exception();
+        } finally {
+            if (oResultSet != null) {
+                oResultSet.close();
+            }
+        }
+        return arrUser;
+    }
+    
     @Override
     public ArrayList<MiembroBean> getAll(ArrayList<FilterBeanHelper> alFilter, HashMap<String, String> hmOrder, Integer expand) throws Exception {
         strSQL += SqlBuilder.buildSqlWhere(alFilter);
@@ -101,6 +146,30 @@ public class MiembroDao implements ViewDaoInterface<MiembroBean>, TableDaoInterf
             }
         }
         return arrMiembro;
+    }    
+    // Para obtener todos los miembros de un tipomiembro
+    public ArrayList<MiembroBean> getAllXTipomiembro(int id_tipomiembro, ArrayList<FilterBeanHelper> alFilter, HashMap<String, String> hmOrder, Integer expand) throws Exception {
+        // definir la nueva condición de la sql
+        strSQL += " and id_tipomiembro= " + id_tipomiembro + " ";
+        strSQL += SqlBuilder.buildSqlWhere(alFilter);
+        strSQL += SqlBuilder.buildSqlOrder(hmOrder);
+        ArrayList<MiembroBean> arrUser = new ArrayList<>();
+        ResultSet oResultSet = null;
+        try {
+            oResultSet = oMysql.getAllSQL(strSQL);
+            while (oResultSet.next()) {
+                MiembroBean oUserBean = new MiembroBean();
+                arrUser.add((MiembroBean) oUserBean.fill(oResultSet, oConnection, oPuserSecurity, expand));
+            }
+        } catch (Exception ex) {
+            Log4j.errorLog(this.getClass().getName() + ":" + (ex.getStackTrace()[0]).getMethodName(), ex);
+            throw new Exception();
+        } finally {
+            if (oResultSet != null) {
+                oResultSet.close();
+            }
+        }
+        return arrUser;
     }
 
     @Override
@@ -144,6 +213,28 @@ public class MiembroDao implements ViewDaoInterface<MiembroBean>, TableDaoInterf
                 strSQL = "UPDATE " + strTable + " ";
                 strSQL += " SET " + oMiembroBean.toPairs();
                 strSQL += " WHERE id=" + oMiembroBean.getId();
+                iResult = oMysql.executeUpdateSQL(strSQL);
+            }
+        } catch (Exception ex) {
+            Log4j.errorLog(this.getClass().getName() + ":" + (ex.getStackTrace()[0]).getMethodName(), ex);
+            throw new Exception();
+        }
+        return iResult;
+    }
+    
+    // Dado un tipomiembro, crear un nuevo miembro o modificar uno ya existente
+    public Integer setXTipousuario(MiembroBean oUsuarioBean, Integer idTipousuario) throws Exception {
+        Integer iResult = null;
+        try {
+            if (oUsuarioBean.getId() == 0) {
+                strSQL = "INSERT INTO " + strTable + " ";
+                strSQL += "(" + oUsuarioBean.getColumns() + ")";
+                strSQL += "VALUES(" + oUsuarioBean.getValuesXTipomiembro(idTipousuario) + ")";
+                iResult = oMysql.executeInsertSQL(strSQL);
+            } else {
+                strSQL = "UPDATE " + strTable;
+                strSQL += " SET " + oUsuarioBean.toPairsXTipomiembro(idTipousuario);
+                strSQL += " WHERE id=" + oUsuarioBean.getId();
                 iResult = oMysql.executeUpdateSQL(strSQL);
             }
         } catch (Exception ex) {

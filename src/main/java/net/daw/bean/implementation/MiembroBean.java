@@ -56,6 +56,16 @@ public class MiembroBean implements GenericBean {
     public MiembroBean(Integer id) {
         this.id = id;
     }
+    
+    //Nuevos constructores para las relaciones 1:N
+    public MiembroBean(Integer id_tipomiembro, Boolean flag) {
+        this.id_tipomiembro = id_tipomiembro;
+    }
+    
+    public MiembroBean(Integer id, Integer id_tipomiembro, Boolean flag) {
+        this.id = id;
+        this.id_tipomiembro = id_tipomiembro;
+    }
 
     public Integer getId() {
         return id;
@@ -206,6 +216,27 @@ public class MiembroBean implements GenericBean {
         strColumns += "id_tipomiembro";
         return strColumns;
     }
+    
+    //Nuevo método para las relaciones 1:N
+    public String getColumnsXTipomiembro() {
+        String strColumns = "";
+        strColumns += "id,";
+        strColumns += "numero,";
+        strColumns += "nombre,";
+        strColumns += "apellidos,";
+        strColumns += "nif,";
+        strColumns += "direccion,";
+        strColumns += "codigopostal,";
+        strColumns += "poblacion,";
+        strColumns += "provincia,";
+        strColumns += "pais,";
+        strColumns += "telefono,";
+        strColumns += "email,";
+        strColumns += "web,";
+        strColumns += "fecha_alta,";
+        strColumns += "fecha_baja";
+        return strColumns;
+    }
 
     @Override
     public String getValues() {
@@ -234,6 +265,36 @@ public class MiembroBean implements GenericBean {
             strColumns += EncodingUtilHelper.stringifyAndQuotate(fecha_baja) + ",";
         }
         strColumns += getId_tipomiembro();
+        return strColumns;
+    }   
+    
+//Nuevo método para las relaciones 1:N
+    public String getValuesXTipomiembro(Integer id_tipomiembro) {
+        String strColumns = "";
+        strColumns += id + ",";
+        strColumns += EncodingUtilHelper.quotate(getNumero()) + ",";
+        strColumns += EncodingUtilHelper.quotate(getNombre()) + ",";
+        strColumns += EncodingUtilHelper.quotate(getApellidos()) + ",";
+        strColumns += EncodingUtilHelper.quotate(getNif()) + ",";
+        strColumns += EncodingUtilHelper.quotate(getDireccion()) + ",";
+        strColumns += EncodingUtilHelper.quotate(getCodigopostal()) + ",";
+        strColumns += EncodingUtilHelper.quotate(getPoblacion()) + ",";
+        strColumns += EncodingUtilHelper.quotate(getProvincia()) + ",";
+        strColumns += EncodingUtilHelper.quotate(getPais()) + ",";
+        strColumns += EncodingUtilHelper.quotate(getTelefono()) + ",";
+        strColumns += EncodingUtilHelper.quotate(getEmail()) + ",";
+        if (fecha_alta == null) {
+            java.util.Date hoy = new Date();
+            strColumns += EncodingUtilHelper.stringifyAndQuotate(hoy) + ",";
+        } else {
+            strColumns += EncodingUtilHelper.stringifyAndQuotate(fecha_alta) + ",";
+        }
+        if (fecha_baja == null) {
+            strColumns += "null" + ",";
+        } else {
+            strColumns += EncodingUtilHelper.stringifyAndQuotate(fecha_baja) + ",";
+        }
+        strColumns += id_tipomiembro;
         return strColumns;
     }
 
@@ -322,6 +383,89 @@ public class MiembroBean implements GenericBean {
             strPairs += (hay) ? ",id_tipomiembro=" : "id_tipomiembro=";
             strPairs += id_tipomiembro;
         }    
+        return strPairs;
+    }
+    
+    //Nuevo método para las relaciones 1:N
+    public String toPairsXTipomiembro(Integer id_tipomiembro) {
+        String strPairs = "";
+        Boolean hay = false;
+        if (numero != null) {
+            strPairs += "numero=" + EncodingUtilHelper.quotate(numero);
+            hay = true;
+        }
+        if (nombre != null) {
+            strPairs += (hay) ? ",nombre=" : "nombre=";
+            strPairs += EncodingUtilHelper.quotate(nombre);
+            hay = true;
+            //strPairs += "nombre=" + EncodingUtilHelper.quotate(nombre) + ",";
+        }
+        if (apellidos != null) {
+            //strPairs += "apellidos=" + EncodingUtilHelper.quotate(apellidos) + ",";
+            strPairs += (hay) ? ",apellidos=" : "apellidos=";
+            strPairs += EncodingUtilHelper.quotate(apellidos);
+            hay = true;
+        }
+        if (nif != null) {
+            //strPairs += "nif=" + EncodingUtilHelper.quotate(nif) + ",";
+            strPairs += (hay) ? ",nif=" : "nif=";
+            strPairs += EncodingUtilHelper.quotate(nif);
+            hay = true;
+        }
+        if (direccion != null) {
+            //strPairs += "direccion=" + EncodingUtilHelper.quotate(direccion) + ",";
+            strPairs += (hay) ? ",direccion=" : "direccion=";
+            strPairs += EncodingUtilHelper.quotate(direccion);
+            hay = true;
+        }
+        if (codigopostal != null) {
+            //strPairs += "codigopostal=" + EncodingUtilHelper.quotate(codigopostal) + ",";
+            strPairs += (hay) ? ",codigopostal=" : "codigopostal=";
+            strPairs += EncodingUtilHelper.quotate(codigopostal);
+            hay = true;
+        }
+        if (poblacion != null) {
+            //strPairs += "poblacion=" + EncodingUtilHelper.quotate(poblacion) + ",";
+            strPairs += (hay) ? ",poblacion=" : "poblacion=";
+            strPairs += EncodingUtilHelper.quotate(poblacion);
+            hay = true;
+        }
+        if (provincia != null) {
+            //strPairs += "provincia=" + EncodingUtilHelper.quotate(provincia) + ",";
+            strPairs += (hay) ? ",provincia=" : "provincia=";
+            strPairs += EncodingUtilHelper.quotate(provincia);
+            hay = true;
+        }
+        if (pais != null) {
+            //strPairs += "pais=" + EncodingUtilHelper.quotate(pais) + ",";
+            strPairs += (hay) ? ",pais=" : "pais=";
+            strPairs += EncodingUtilHelper.quotate(pais);
+            hay = true;
+        }
+        if (telefono != null) {
+            //strPairs += "telefono=" + EncodingUtilHelper.quotate(telefono) + ",";
+            strPairs += (hay) ? ",telefono=" : "telefono=";
+            strPairs += EncodingUtilHelper.quotate(telefono);
+            hay = true;
+        }
+        if (email != null) {
+            //strPairs += "email=" + EncodingUtilHelper.quotate(email) + ",";
+            strPairs += (hay) ? ",email=" : "email=";
+            strPairs += EncodingUtilHelper.quotate(email);
+            hay = true;
+        }
+        if (fecha_alta != null) {
+            //strPairs += "fecha_alta=" + EncodingUtilHelper.stringifyAndQuotate(fecha_alta) + ",";
+            strPairs += (hay) ? ",fecha_alta=" : "fecha_alta=";
+            strPairs += EncodingUtilHelper.stringifyAndQuotate(fecha_alta);
+            hay = true;
+        }
+        if (fecha_baja != null) {
+            //strPairs += "fecha_baja=" + EncodingUtilHelper.stringifyAndQuotate(fecha_baja) + ",";
+            strPairs += (hay) ? ",fecha_baja=" : "fecha_baja=";
+            strPairs += EncodingUtilHelper.stringifyAndQuotate(fecha_baja);
+            hay = true;
+        }
         return strPairs;
     }
 

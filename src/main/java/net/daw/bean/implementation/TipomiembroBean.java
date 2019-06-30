@@ -41,6 +41,8 @@ public class TipomiembroBean implements GenericBean {
     private Integer id = 0;
     @Expose
     private String tipomiembro;
+    @Expose
+    private Integer total = 1; // Si un tipomiembro está en la bbdd es porque al menos hay un miembro de ese tipo
 
     public TipomiembroBean() {
     }
@@ -63,13 +65,22 @@ public class TipomiembroBean implements GenericBean {
 
     public void setTipomiembro(String tipomiembro) {
         this.tipomiembro = tipomiembro;
+    }   
+    
+    public Integer getTotal() {
+        return total;
+    }
+
+    public void setTotal(Integer total) {
+        this.total = total;
     }
 
     @Override
     public String getColumns() {
         String strColumns = "";
         strColumns += "id,";
-        strColumns += "tipomiembro";
+        strColumns += "tipomiembro";//,";
+//        strColumns += "total";
         return strColumns;
     }
 
@@ -77,7 +88,8 @@ public class TipomiembroBean implements GenericBean {
     public String getValues() {
         String strColumns = "";
         strColumns += id + ",";
-        strColumns += EncodingUtilHelper.quotate(tipomiembro);
+        strColumns += EncodingUtilHelper.quotate(tipomiembro);// + ",";
+//        strColumns += total;
         return strColumns;
     }
 
@@ -89,7 +101,11 @@ public class TipomiembroBean implements GenericBean {
         Boolean hay = false;
         if (tipomiembro != null) {
             strPairs += "tipomiembro=" + EncodingUtilHelper.quotate(tipomiembro);
-            hay = true;
+            hay = true;           
+        }
+        if (total != 0) {
+            strPairs += (hay) ? ",total=" : "total=";
+            strPairs += total;            
         }
         return strPairs;
     }
@@ -98,6 +114,7 @@ public class TipomiembroBean implements GenericBean {
     public TipomiembroBean fill(ResultSet oResultSet, Connection pooledConnection, PusuarioBean oPuserBean_security, Integer expand) throws SQLException, Exception {
         this.setId(oResultSet.getInt("id"));
         this.setTipomiembro(oResultSet.getString("tipomiembro"));
+        this.setTotal(oResultSet.getInt("total"));
         return this;
     }
 

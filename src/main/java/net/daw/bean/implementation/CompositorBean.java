@@ -45,6 +45,8 @@ public class CompositorBean implements GenericBean {
     private String apellidos;
     @Expose
     private String notas;
+    @Expose
+    private Integer total = 1; // Si un compositor está en la bbdd es porque al menos hay una obra de él
 
     public CompositorBean() {
     }
@@ -85,13 +87,22 @@ public class CompositorBean implements GenericBean {
         this.notas = notas;
     }
     
+    public Integer getTotal() {
+        return total;
+    }
+
+    public void setTotal(Integer total) {
+        this.total = total;
+    }
+    
     @Override
     public String getColumns() {
         String strColumns = "";
         strColumns += "id,";
         strColumns += "nombre,";
         strColumns += "apellidos,";
-        strColumns += "notas";
+        strColumns += "notas";//,";
+//        strColumns += "total";
         return strColumns;
     }
 
@@ -101,7 +112,8 @@ public class CompositorBean implements GenericBean {
         strColumns += id + ",";
         strColumns += EncodingUtilHelper.quotate(nombre) + ",";
         strColumns += EncodingUtilHelper.quotate(apellidos) + ",";
-        strColumns += EncodingUtilHelper.quotate(notas);
+        strColumns += EncodingUtilHelper.quotate(notas);// + ",";
+//        strColumns += total;
         return strColumns;
     }
 
@@ -120,8 +132,13 @@ public class CompositorBean implements GenericBean {
         }
         if (notas != null) {
             strPairs += (hay) ? ",notas=" : "notas=";
-            strPairs += EncodingUtilHelper.quotate(notas);            
+            strPairs += EncodingUtilHelper.quotate(notas); 
+//            hay = true;           
         }
+//        if (total != null) {
+//            strPairs += (hay) ? ",total=" : "total=";
+//            strPairs += total;            
+//        }
         return strPairs;
     }
 
@@ -131,6 +148,7 @@ public class CompositorBean implements GenericBean {
         this.setNombre(oResultSet.getString("nombre"));
         this.setApellidos(oResultSet.getString("apellidos"));
         this.setNotas(oResultSet.getString("notas"));
+        this.setTotal(oResultSet.getInt("total"));
         return this;
     }
 

@@ -66,7 +66,7 @@ public class ParameterCook {
     }
 
     public static int prepareId(HttpServletRequest request) {
-        int result = 0;
+        int result;
         if (request.getParameter("id") == null) {
             result = 0;
         } else {

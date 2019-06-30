@@ -44,7 +44,19 @@ import net.daw.helper.statics.SqlBuilder;
 public class RepertorioDao implements ViewDaoInterface<RepertorioBean>, TableDaoInterface<RepertorioBean> {
 
     private String strTable = "repertorio";
+    /*
+    SELECT ac.nombre, o.titulo, ag.agrupacion
+FROM repertorio r, obra o, agrupacion ag, acto ac
+WHERE r.id_acto = ac.id
+AND r.id_obra = o.id
+AND r.id_agrupacion = ag.id
+AND r.id_acto = 31
+ORDER BY r.id_agrupacion
+    */
     private String strSQL = "select * from " + strTable + " where 1=1 ";
+    private String strSQLCount = "SELECT COUNT(*) FROM " + strTable + " WHERE 1=1 ";
+//    private String strSQL = "SELECT ac.nombre, o.titulo, ag.agrupacion FROM repertorio r, obra o, agrupacion ag, acto ac "
+//            + "WHERE r.id_acto = ac.id AND r.id_obra = o.id AND r.id_agrupacion = ag.id ";
     private MysqlData oMysql = null;
     private Connection oConnection = null;
     private PusuarioBean oPusuarioSecurity = null;
@@ -65,10 +77,25 @@ public class RepertorioDao implements ViewDaoInterface<RepertorioBean>, TableDao
 
     @Override
     public Long getCount(ArrayList<FilterBeanHelper> hmFilter) throws Exception {
-        strSQL += SqlBuilder.buildSqlWhere(hmFilter);
+        strSQLCount += SqlBuilder.buildSqlWhere(hmFilter);
         Long pages = 0L;
         try {
-            pages = oMysql.getCount(strSQL);
+            pages = oMysql.getCount(strSQLCount);
+        } catch (Exception ex) {
+            Log4j.errorLog(this.getClass().getName() + ":" + (ex.getStackTrace()[0]).getMethodName(), ex);
+            throw new Exception();
+        }
+        return pages;
+    }   
+    
+    // Para contar las obras del repertorio de un acto - Relación N:M
+    public Long getCountXActo(int idActo, ArrayList<FilterBeanHelper> hmFilter) throws Exception {
+        // definir la nueva condición de la sql
+        strSQLCount += " and id_acto= " + idActo + " "; 
+        strSQLCount += SqlBuilder.buildSqlWhere(hmFilter);
+        Long pages = 0L;
+        try {
+            pages = oMysql.getCount(strSQLCount);
         } catch (Exception ex) {
             Log4j.errorLog(this.getClass().getName() + ":" + (ex.getStackTrace()[0]).getMethodName(), ex);
             throw new Exception();
@@ -79,8 +106,9 @@ public class RepertorioDao implements ViewDaoInterface<RepertorioBean>, TableDao
     @Override
     public ArrayList<RepertorioBean> getPage(int intRegsPerPag, int intPage, ArrayList<FilterBeanHelper> alFilter, HashMap<String, String> hmOrder, Integer expand) throws Exception {
         strSQL += SqlBuilder.buildSqlWhere(alFilter);
-        strSQL += SqlBuilder.buildSqlOrder(hmOrder);
-        strSQL += SqlBuilder.buildSqlLimit(oMysql.getCount(strSQL), intRegsPerPag, intPage);
+//        strSQL += SqlBuilder.buildSqlOrder(hmOrder);
+        strSQL += " ORDER BY id_agrupacion";
+        strSQL += SqlBuilder.buildSqlLimit(oMysql.getCount(strSQLCount), intRegsPerPag, intPage);
         ArrayList<RepertorioBean> arrRepertorio = new ArrayList<>();
         ResultSet oResultSet = null;
         try {
@@ -101,6 +129,36 @@ public class RepertorioDao implements ViewDaoInterface<RepertorioBean>, TableDao
             }
         }
         return arrRepertorio;
+    }
+
+    public ArrayList<RepertorioBean> getPageXActo(int idActo, int intRegsPerPag, int intPage, ArrayList<FilterBeanHelper> alFilter, HashMap<String, String> hmOrder, Integer expand) throws Exception {
+        // definir la nueva condición de la sql
+        strSQLCount += " and id_acto= " + idActo + " ";  
+        strSQL += " AND id_acto= " + idActo + " ";        
+        strSQL += SqlBuilder.buildSqlWhere(alFilter);        
+//        strSQL += SqlBuilder.buildSqlOrder(hmOrder);
+        strSQL += " ORDER BY id_agrupacion";
+        strSQL += SqlBuilder.buildSqlLimit(oMysql.getCount(strSQLCount), intRegsPerPag, intPage);
+        ArrayList<RepertorioBean> arrUser = new ArrayList<>();
+        ResultSet oResultSet = null;
+        try {
+            oResultSet = oMysql.getAllSQL(strSQL);
+            while (oResultSet.next()) {
+                RepertorioBean oUserBean = new RepertorioBean();
+                arrUser.add((RepertorioBean) oUserBean.fill(oResultSet, oConnection, oPusuarioSecurity, expand));
+            }
+            if (oResultSet != null) {
+                oResultSet.close();
+            }
+        } catch (Exception ex) {
+            Log4j.errorLog(this.getClass().getName() + ":" + (ex.getStackTrace()[0]).getMethodName(), ex);
+            throw new Exception();
+        } finally {
+            if (oResultSet != null) {
+                oResultSet.close();
+            }
+        }
+        return arrUser;
     }
 
     @Override
@@ -124,6 +182,32 @@ public class RepertorioDao implements ViewDaoInterface<RepertorioBean>, TableDao
             }
         }
         return arrRepertorio;
+    }    
+
+    // Para obtener todas las obras de un compositor 
+    public ArrayList<RepertorioBean> getAllXActo(int idActo, ArrayList<FilterBeanHelper> alFilter, HashMap<String, String> hmOrder, Integer expand) throws Exception {
+        // definir la nueva condición de la sql
+        strSQL += " AND id_acto= " + idActo + " ";
+        strSQL += SqlBuilder.buildSqlWhere(alFilter);
+//        strSQL += SqlBuilder.buildSqlOrder(hmOrder);
+        strSQL += " ORDER BY id_agrupacion";
+        ArrayList<RepertorioBean> arrUser = new ArrayList<>();
+        ResultSet oResultSet = null;
+        try {
+            oResultSet = oMysql.getAllSQL(strSQL);
+            while (oResultSet.next()) {
+                RepertorioBean oUserBean = new RepertorioBean();
+                arrUser.add((RepertorioBean) oUserBean.fill(oResultSet, oConnection, oPusuarioSecurity, expand));
+            }
+        } catch (Exception ex) {
+            Log4j.errorLog(this.getClass().getName() + ":" + (ex.getStackTrace()[0]).getMethodName(), ex);
+            throw new Exception();
+        } finally {
+            if (oResultSet != null) {
+                oResultSet.close();
+            }
+        }
+        return arrUser;
     }
 
     @Override

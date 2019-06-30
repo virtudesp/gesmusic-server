@@ -69,6 +69,8 @@ public class MiembroService implements TableServiceInterface, ViewServiceInterfa
     @Override
     public ReplyBean getcount() throws Exception {
         if (this.checkpermission("getcount")) {
+            // parámetro añadido
+            int idTipomiembro = ParameterCook.prepareId(oRequest);
             String data = null;
             ArrayList<FilterBeanHelper> alFilter = ParameterCook.getFilterParams(ParameterCook.prepareFilter(oRequest));
             Connection oConnection = null;
@@ -77,7 +79,13 @@ public class MiembroService implements TableServiceInterface, ViewServiceInterfa
                 oDataConnectionSource = getSourceConnection();
                 oConnection = oDataConnectionSource.newConnection();
                 MiembroDao oMiembroDao = new MiembroDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), null);
-                data = JsonMessage.getJsonExpression(200, Long.toString(oMiembroDao.getCount(alFilter)));
+                // Si no hay idTipomiembro el método es de miembro y si hay idTipomiembro es de miembrosxtipomiembro
+                if (idTipomiembro == 0) {
+                    data = JsonMessage.getJsonExpression(200, Long.toString(oMiembroDao.getCount(alFilter)));
+                } else {
+                    data = JsonMessage.getJsonExpression(200, Long.toString(oMiembroDao.getCountXTipomiembro(idTipomiembro, alFilter)));
+                }
+                
             } catch (Exception ex) {
                 Log4j.errorLog(this.getClass().getName() + ":" + (ex.getStackTrace()[0]).getMethodName(), ex);
                 throw new Exception();
@@ -129,6 +137,8 @@ public class MiembroService implements TableServiceInterface, ViewServiceInterfa
     @Override
     public ReplyBean getall() throws Exception {
         if (this.checkpermission("getall")) {
+            // parámetro añadido
+            int idTipomiembro = ParameterCook.prepareId(oRequest);
             HashMap<String, String> hmOrder = ParameterCook.getOrderParams(ParameterCook.prepareOrder(oRequest));
             ArrayList<FilterBeanHelper> alFilter = ParameterCook.getFilterParams(ParameterCook.prepareFilter(oRequest));
             String data = null;
@@ -138,7 +148,13 @@ public class MiembroService implements TableServiceInterface, ViewServiceInterfa
                 oDataConnectionSource = getSourceConnection();
                 oConnection = oDataConnectionSource.newConnection();
                 MiembroDao oMiembroDao = new MiembroDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), null);
-                ArrayList<MiembroBean> arrBeans = oMiembroDao.getAll(alFilter, hmOrder, AppConfigurationHelper.getJsonMsgDepth());
+                // Si no hay idTipomiembro el método es de miembro y si hay idTipomiembro es de miembrosxtipomiembro
+                ArrayList<MiembroBean> arrBeans;
+                if (idTipomiembro == 0) {
+                    arrBeans = oMiembroDao.getAll(alFilter, hmOrder, AppConfigurationHelper.getJsonMsgDepth());
+                } else {
+                    arrBeans = oMiembroDao.getAllXTipomiembro(idTipomiembro, alFilter, hmOrder, AppConfigurationHelper.getJsonMsgDepth());
+                }
                 data = JsonMessage.getJsonExpression(200, AppConfigurationHelper.getGson().toJson(arrBeans));
             } catch (Exception ex) {
                 Log4j.errorLog(this.getClass().getName() + ":" + (ex.getStackTrace()[0]).getMethodName(), ex);
@@ -160,6 +176,8 @@ public class MiembroService implements TableServiceInterface, ViewServiceInterfa
     @Override
     public ReplyBean getpage() throws Exception {
         if (this.checkpermission("getpage")) {
+            // parámetro añadido
+            int idTipomiembro = ParameterCook.prepareId(oRequest);
             int intRegsPerPag = ParameterCook.prepareRpp(oRequest);
             int intPage = ParameterCook.preparePage(oRequest);
             HashMap<String, String> hmOrder = ParameterCook.getOrderParams(ParameterCook.prepareOrder(oRequest));
@@ -171,7 +189,13 @@ public class MiembroService implements TableServiceInterface, ViewServiceInterfa
                 oDataConnectionSource = getSourceConnection();
                 oConnection = oDataConnectionSource.newConnection();
                 MiembroDao oMiembroDao = new MiembroDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), null);
-                List<MiembroBean> arrBeans = oMiembroDao.getPage(intRegsPerPag, intPage, alFilter, hmOrder, AppConfigurationHelper.getJsonMsgDepth());
+                // Si no hay idTipomiembro el método es de miembro y si hay idTipomiembro es de miembrosxtipomiembro
+                ArrayList<MiembroBean> arrBeans;
+                if (idTipomiembro == 0) {
+                    arrBeans = oMiembroDao.getPage(intRegsPerPag, intPage, alFilter, hmOrder, AppConfigurationHelper.getJsonMsgDepth());
+                } else {
+                    arrBeans = oMiembroDao.getPageXTipomiembro(idTipomiembro, intRegsPerPag, intPage, alFilter, hmOrder, AppConfigurationHelper.getJsonMsgDepth());
+                }
                 data = JsonMessage.getJsonExpression(200, AppConfigurationHelper.getGson().toJson(arrBeans));
             } catch (Exception ex) {
                 Log4j.errorLog(this.getClass().getName() + ":" + (ex.getStackTrace()[0]).getMethodName(), ex);
@@ -231,19 +255,16 @@ public class MiembroService implements TableServiceInterface, ViewServiceInterfa
             // Se necesita el id para diferenciar un insert de un update enviando como parámetro where al crear oMiembroBean 
             JsonParser parser = new JsonParser();
             JsonElement elementObject = parser.parse(jason);
-            String strRequestId;
-            try{
-                strRequestId = elementObject.getAsJsonObject().get("id").getAsString();
-            } catch (Exception e){
-                strRequestId = "0";
-            }
-            Integer requestId = Integer.parseInt(strRequestId);
+            // Se necesita el id para diferenciar un insert de un update enviando como parámetro where al crear oUsuarioBean             
+            Integer id = ParameterCook.prepareId(oRequest);
             String where = "";
-            if (requestId == 0) {
+            if (id == 0) {
                 where = null;
             } else {
-                where += " where id=" + requestId;
+                where += " where id=" + id;
             }
+            // parámetro añadido
+            int idTipomiembro = ParameterCook.prepareId(oRequest);
             ReplyBean oReplyBean = new ReplyBean();
             Connection oConnection = null;
             ConnectionInterface oDataConnectionSource = null;
@@ -252,14 +273,23 @@ public class MiembroService implements TableServiceInterface, ViewServiceInterfa
                 oConnection = oDataConnectionSource.newConnection();
                 oConnection.setAutoCommit(false);
                 MiembroDao oMiembroDao = new MiembroDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), where);
-                //MiembroDao oMiembroDao = new MiembroDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), null);
-                MiembroBean oMiembroBean;
-                if (requestId == 0) {
-                    oMiembroBean = new MiembroBean();
+                MiembroBean oMiembroBean;  
+                // Se crea el objeto según los parámetros que hay
+                if (idTipomiembro == 0) {
+                    // para miembro
+                    if (id == 0) {
+                        oMiembroBean = new MiembroBean(); // nuevo miembro
+                    } else {
+                        oMiembroBean = new MiembroBean(id); // actualizar un miembro
+                    }
                 } else {
-                    oMiembroBean = new MiembroBean(requestId);
+                    // para miembrosxtipomiembro
+                    if (id == 0) {
+                        oMiembroBean = new MiembroBean(idTipomiembro, true); // crear un miembro del tipomiembro idTipomiembro
+                    } else {
+                        oMiembroBean = new MiembroBean(id, idTipomiembro, true); // actualizar una obra del tipomiembro idTipomiembro
+                    }
                 }
-                //MiembroBean oMiembroBean = new MiembroBean();
                 oMiembroBean = AppConfigurationHelper.getGson().fromJson(jason, oMiembroBean.getClass());
                 if (oMiembroBean != null) {
                     Integer iResult = oMiembroDao.set(oMiembroBean);

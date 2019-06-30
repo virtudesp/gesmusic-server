@@ -263,7 +263,7 @@ public class ObraService implements TableServiceInterface, ViewServiceInterface 
             } else {
                 where += " where id=" + id; // para modificar una obra 
             }
-            // Parámetro añadido paa relaciones 1:n
+            // Parámetro añadido para relaciones 1:n
             int idCompositor = ParameterCook.prepareForeignId(oRequest);
             // hasta aquí lo que he añadido yo
 

@@ -100,13 +100,6 @@ public class SqlBuilder {
         }
         return strSQLOrder;
     }
-
-//    public static String buildSqlLimit(int intTotalRegs, int intRegsPerPage, int intPageNumber) {
-//        int maxPaginas = new Double(intTotalRegs / intRegsPerPage).intValue();
-//        intPageNumber = Math.min(intPageNumber - 1, maxPaginas) + 1;
-//        int intOffset = Math.max(((intPageNumber - 1) * intRegsPerPage), 0);
-//        return " LIMIT " + intOffset + " , " + intRegsPerPage;
-//    }
     
     public static String buildSqlLimit(Long intTotalRegs, Integer intRegsPerPage, Integer intPageNumber) {
         String SQLLimit = "";

@@ -57,6 +57,16 @@ public class UsuarioBean implements GenericBean {
         this.id = id;
     }
 
+    //Nuevos constructores para las relaciones 1:N
+    public UsuarioBean(Integer id_tipousuario, Boolean flag) {
+        this.id_tipousuario = id_tipousuario;
+    }
+    
+    public UsuarioBean(Integer id, Integer id_tipousuario, Boolean flag) {
+        this.id = id;
+        this.id_tipousuario = id_tipousuario;
+    }
+
     public Integer getId() {
         return id;
     }
@@ -107,8 +117,27 @@ public class UsuarioBean implements GenericBean {
         return strColumns;
     }
 
+    //Nuevo método para las relaciones 1:N
+    public String getColumnsXTipousuario() {
+        String strColumns = "";
+        strColumns += "id,";
+        strColumns += "username,";
+        strColumns += "userpass";
+        return strColumns;
+    }
+
     @Override
     public String getValues() {
+        String strColumns = "";
+        strColumns += id + ",";
+        strColumns += EncodingUtilHelper.quotate(username) + ",";
+        strColumns += EncodingUtilHelper.quotate(userpass) + ",";
+        strColumns += id_tipousuario;
+        return strColumns;
+    }
+
+    //Nuevo método para las relaciones 1:N
+    public String getValuesXTipousuario(Integer id_tipousuario) {
         String strColumns = "";
         strColumns += id + ",";
         strColumns += EncodingUtilHelper.quotate(username) + ",";
@@ -123,6 +152,21 @@ public class UsuarioBean implements GenericBean {
 //        strPairs += "username=" + EncodingUtilHelper.quotate(username) + ",";
 //        strPairs += "userpass=" + EncodingUtilHelper.quotate(userpass) + ",";
 //        strPairs += "id_tipousuario=" + id_tipousuario;
+        Boolean hay = false;
+        if (username != null) {
+            strPairs += "username=" + EncodingUtilHelper.quotate(username);
+            hay = true;
+        }
+        if (userpass != null) {
+            strPairs += (hay) ? ",userpass=" : "userpass=";
+            strPairs += EncodingUtilHelper.quotate(userpass);
+        }
+        return strPairs;
+    }
+
+    //Nuevo método para las relaciones 1:N
+    public String toPairsXTipousuario(Integer id_tipousuario) {
+        String strPairs = "";
         Boolean hay = false;
         if (username != null) {
             strPairs += "username=" + EncodingUtilHelper.quotate(username);
@@ -150,8 +194,7 @@ public class UsuarioBean implements GenericBean {
             //this.setIdUsuario
         } else {
             this.setId_tipousuario(oResultSet.getInt("id_tipousuario"));
-        }
-        
+        }        
         return this;
     }
 }

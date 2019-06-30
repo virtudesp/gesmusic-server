@@ -72,6 +72,8 @@ public class UsuarioService implements TableServiceInterface, ViewServiceInterfa
     @Override
     public ReplyBean getcount() throws Exception {
         if (this.checkpermission("getcount")) {
+            // parámetro añadido
+            int idTipousuario = ParameterCook.prepareId(oRequest);
             String data = null;
             ArrayList<FilterBeanHelper> alFilter = ParameterCook.getFilterParams(ParameterCook.prepareFilter(oRequest));
             Connection oConnection = null;
@@ -81,7 +83,12 @@ public class UsuarioService implements TableServiceInterface, ViewServiceInterfa
                 oDataConnectionSource = getSourceConnection();
                 oConnection = oDataConnectionSource.newConnection();
                 UsuarioDao oUserDao = new UsuarioDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), null);
-                data = JsonMessage.getJsonExpression(200, Long.toString(oUserDao.getCount(alFilter)));
+                // Si no hay idTipousuario el método es de usuario y si hay idTipousuario es de usuariosxtipousuario
+                if (idTipousuario == 0) {
+                    data = JsonMessage.getJsonExpression(200, Long.toString(oUserDao.getCount(alFilter)));
+                } else {
+                    data = JsonMessage.getJsonExpression(200, Long.toString(oUserDao.getCountXTipousuario(idTipousuario, alFilter)));
+                }
             } catch (Exception ex) {
                 Log4j.errorLog(this.getClass().getName() + ":" + (ex.getStackTrace()[0]).getMethodName(), ex);
                 throw new Exception();
@@ -134,6 +141,8 @@ public class UsuarioService implements TableServiceInterface, ViewServiceInterfa
     @Override
     public ReplyBean getall() throws Exception {
         if (this.checkpermission("getall")) {
+            // parámetro añadido
+            int idTipousuario = ParameterCook.prepareId(oRequest);
             HashMap<String, String> hmOrder = ParameterCook.getOrderParams(ParameterCook.prepareOrder(oRequest));
             ArrayList<FilterBeanHelper> alFilter = ParameterCook.getFilterParams(ParameterCook.prepareFilter(oRequest));
             String data = null;
@@ -143,7 +152,13 @@ public class UsuarioService implements TableServiceInterface, ViewServiceInterfa
                 oDataConnectionSource = getSourceConnection();
                 oConnection = oDataConnectionSource.newConnection();
                 UsuarioDao oUserDao = new UsuarioDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), null);
-                ArrayList<UsuarioBean> arrBeans = oUserDao.getAll(alFilter, hmOrder, AppConfigurationHelper.getJsonMsgDepth());
+                // Si no hay idTipousuario el método es de usuario y si hay idTipousuario es de usuariosxtipousuario
+                ArrayList<UsuarioBean> arrBeans;
+                if (idTipousuario == 0) {
+                    arrBeans = oUserDao.getAll(alFilter, hmOrder, AppConfigurationHelper.getJsonMsgDepth());
+                } else {
+                    arrBeans = oUserDao.getAllXTipousuario(idTipousuario, alFilter, hmOrder, AppConfigurationHelper.getJsonMsgDepth());
+                }
                 data = JsonMessage.getJsonExpression(200, AppConfigurationHelper.getGson().toJson(arrBeans));
             } catch (Exception ex) {
                 Log4j.errorLog(this.getClass().getName() + ":" + (ex.getStackTrace()[0]).getMethodName(), ex);
@@ -165,6 +180,8 @@ public class UsuarioService implements TableServiceInterface, ViewServiceInterfa
     @Override
     public ReplyBean getpage() throws Exception {
         if (this.checkpermission("getpage")) {
+            // parámetro añadido
+            int idTipousuario = ParameterCook.prepareId(oRequest);
             int intRegsPerPag = ParameterCook.prepareRpp(oRequest);
             int intPage = ParameterCook.preparePage(oRequest);
             HashMap<String, String> hmOrder = ParameterCook.getOrderParams(ParameterCook.prepareOrder(oRequest));
@@ -176,7 +193,13 @@ public class UsuarioService implements TableServiceInterface, ViewServiceInterfa
                 oDataConnectionSource = getSourceConnection();
                 oConnection = oDataConnectionSource.newConnection();
                 UsuarioDao oUserDao = new UsuarioDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), null);
-                List<UsuarioBean> arrBeans = oUserDao.getPage(intRegsPerPag, intPage, alFilter, hmOrder, AppConfigurationHelper.getJsonMsgDepth());
+                // Si no hay idTipousuario el método es de usuario y si hay idTipousuario es de usuariosxtipousuario
+                List<UsuarioBean> arrBeans;
+                if (idTipousuario == 0) {
+                    arrBeans = oUserDao.getPage(intRegsPerPag, intPage, alFilter, hmOrder, AppConfigurationHelper.getJsonMsgDepth());
+                } else {
+                    arrBeans = oUserDao.getPageXTipousuario(idTipousuario, intRegsPerPag, intPage, alFilter, hmOrder, AppConfigurationHelper.getJsonMsgDepth());
+                }
                 data = JsonMessage.getJsonExpression(200, AppConfigurationHelper.getGson().toJson(arrBeans));
             } catch (Exception ex) {
                 Log4j.errorLog(this.getClass().getName() + ":" + (ex.getStackTrace()[0]).getMethodName(), ex);
@@ -233,22 +256,18 @@ public class UsuarioService implements TableServiceInterface, ViewServiceInterfa
     public ReplyBean set() throws Exception {
         if (this.checkpermission("set")) {
             String jason = ParameterCook.prepareJson(oRequest);
-            // Se necesita el id para diferenciar un insert de un update enviando como parámetro where al crear oMiembroBean 
             JsonParser parser = new JsonParser();
             JsonElement elementObject = parser.parse(jason);
-            String strRequestId;
-            try{
-                strRequestId = elementObject.getAsJsonObject().get("id").getAsString();
-            } catch (Exception e){
-                strRequestId = "0";
-            }
-            Integer requestId = Integer.parseInt(strRequestId);
+            // Se necesita el id para diferenciar un insert de un update enviando como parámetro where al crear oUsuarioBean             
+            Integer id = ParameterCook.prepareId(oRequest);
             String where = "";
-            if (requestId == 0) {
-                where = null;
+            if (id == 0) {
+                where = null; // para insertar una nuevo usuario
             } else {
-                where += " where id=" + requestId;
+                where += " where id=" + id; // para modificar un usuario
             }
+            // Parámetro añadido para relaciones 1:n
+            int idTipousuario = ParameterCook.prepareForeignId(oRequest);
             // hasta aquí lo que he añadido yo
             ReplyBean oReplyBean = new ReplyBean();
             Connection oConnection = null;
@@ -261,14 +280,31 @@ public class UsuarioService implements TableServiceInterface, ViewServiceInterfa
 //                UsuarioBean oUserBean = new UsuarioBean();
                 UsuarioDao oUserDao = new UsuarioDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), where);
                 UsuarioBean oUserBean;
-                if (requestId == 0) {
-                    oUserBean = new UsuarioBean();
+                // Se crea el objeto según los parámetros que hay
+                if (idTipousuario == 0) {
+                    // para Usuario
+                    if (id == 0) {
+                        oUserBean = new UsuarioBean(); // nuevo Usuario
+                    } else {
+                        oUserBean = new UsuarioBean(id); // actualizar un Usuario
+                    }
                 } else {
-                    oUserBean = new UsuarioBean(requestId);
+                    // para usuariosxtipousuario
+                    if (id == 0) {
+                        oUserBean = new UsuarioBean(idTipousuario, true); // crear un usuario del tipousuario idTipousuario
+                    } else {
+                        oUserBean = new UsuarioBean(id, idTipousuario, true); // actualizar una obra del tipousuario idTipousuario
+                    }
                 }
                 oUserBean = AppConfigurationHelper.getGson().fromJson(jason, oUserBean.getClass());
                 if (oUserBean != null) {
-                    Integer iResult = oUserDao.set(oUserBean);
+                    Integer iResult;// = oUserDao.set(oUserBean);
+                    // Si no hay idTipousuario el método es de usuario y si hay idTipousuario es de usuariosxtipousuario
+                    if (idTipousuario == 0) {
+                        iResult = oUserDao.set(oUserBean);
+                    } else {
+                        iResult = oUserDao.setXTipousuario(oUserBean, idTipousuario);
+                    }
                     if (iResult >= 1) {
                         oReplyBean.setCode(200);
                         oReplyBean.setJson(JsonMessage.getJsonExpression(200, iResult.toString()));

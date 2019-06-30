@@ -44,7 +44,9 @@ import net.daw.helper.statics.SqlBuilder;
 public class CompositorDao implements ViewDaoInterface<CompositorBean>, TableDaoInterface<CompositorBean> {
 
     private String strTable = "compositor";
-    private String strSQL = "select * from " + strTable + " where 1=1 ";
+    private String strSQL = "SELECT *, (SELECT count(*) FROM obra WHERE id_compositor = compositor.id) AS total FROM compositor where 1=1 ";
+//    private String strSQL = "select * from " + strTable + " where 1=1 ";
+    private String strSQLCount = "SELECT COUNT(*) FROM " + strTable + " WHERE 1=1 ";
     private MysqlData oMysql = null;
     private Connection oConnection = null;
     private PusuarioBean oPuserSecurity = null;
@@ -65,10 +67,11 @@ public class CompositorDao implements ViewDaoInterface<CompositorBean>, TableDao
 
     @Override
     public Long getCount(ArrayList<FilterBeanHelper> hmFilter) throws Exception {
-        strSQL += SqlBuilder.buildSqlWhere(hmFilter);
+//        strSQL += SqlBuilder.buildSqlWhere(hmFilter);
+         strSQLCount += SqlBuilder.buildSqlWhere(hmFilter);
         Long pages = 0L;
         try {
-            pages = oMysql.getCount(strSQL);
+            pages = oMysql.getCount(strSQLCount);
         } catch (Exception ex) {
             Log4j.errorLog(this.getClass().getName() + ":" + (ex.getStackTrace()[0]).getMethodName(), ex);
             throw new Exception();
@@ -80,7 +83,7 @@ public class CompositorDao implements ViewDaoInterface<CompositorBean>, TableDao
     public ArrayList<CompositorBean> getPage(int intRegsPerPag, int intPage, ArrayList<FilterBeanHelper> alFilter, HashMap<String, String> hmOrder, Integer expand) throws Exception {
         strSQL += SqlBuilder.buildSqlWhere(alFilter);
         strSQL += SqlBuilder.buildSqlOrder(hmOrder);
-        strSQL += SqlBuilder.buildSqlLimit(oMysql.getCount(strSQL), intRegsPerPag, intPage);
+        strSQL += SqlBuilder.buildSqlLimit(oMysql.getCount(strSQLCount), intRegsPerPag, intPage);
         ArrayList<CompositorBean> arrCompositor = new ArrayList<>();
         ResultSet oResultSet = null;
         try {
