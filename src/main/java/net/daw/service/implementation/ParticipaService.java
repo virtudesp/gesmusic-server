@@ -70,6 +70,8 @@ public class ParticipaService implements TableServiceInterface, ViewServiceInter
     @Override
     public ReplyBean getcount() throws Exception {
         if (this.checkpermission("getcount")) {
+            // parámetro añadido
+            int idActo = ParameterCook.prepareId(oRequest);
             String data = null;
             ArrayList<FilterBeanHelper> alFilter = ParameterCook.getFilterParams(ParameterCook.prepareFilter(oRequest));
             Connection oConnection = null;
@@ -78,7 +80,12 @@ public class ParticipaService implements TableServiceInterface, ViewServiceInter
                 oDataConnectionSource = getSourceConnection();
                 oConnection = oDataConnectionSource.newConnection();
                 ParticipaDao oParticipaDao = new ParticipaDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), null);
-                data = JsonMessage.getJsonExpression(200, Long.toString(oParticipaDao.getCount(alFilter)));
+//                data = JsonMessage.getJsonExpression(200, Long.toString(oParticipaDao.getCount(alFilter)));
+                if (idActo == 0) {
+                    data = JsonMessage.getJsonExpression(200, Long.toString(oParticipaDao.getCount(alFilter)));
+                } else {
+                    data = JsonMessage.getJsonExpression(200, Long.toString(oParticipaDao.getCountXActo(idActo, alFilter)));
+                }
             } catch (Exception ex) {
                 Log4j.errorLog(this.getClass().getName() + ":" + (ex.getStackTrace()[0]).getMethodName(), ex);
                 throw new Exception();
@@ -131,6 +138,8 @@ public class ParticipaService implements TableServiceInterface, ViewServiceInter
     @Override
     public ReplyBean getall() throws Exception {
         if (this.checkpermission("getall")) {
+            // parámetro añadido
+            int idActo = ParameterCook.prepareForeignId(oRequest);
             HashMap<String, String> hmOrder = ParameterCook.getOrderParams(ParameterCook.prepareOrder(oRequest));
             ArrayList<FilterBeanHelper> alFilter = ParameterCook.getFilterParams(ParameterCook.prepareFilter(oRequest));
             String data = null;
@@ -140,7 +149,13 @@ public class ParticipaService implements TableServiceInterface, ViewServiceInter
                 oDataConnectionSource = getSourceConnection();
                 oConnection = oDataConnectionSource.newConnection();
                 ParticipaDao oParticipaDao = new ParticipaDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), null);
-                ArrayList<ParticipaBean> arrBeans = oParticipaDao.getAll(alFilter, hmOrder, AppConfigurationHelper.getJsonMsgDepth());
+                
+                ArrayList<ParticipaBean> arrBeans;
+                if (idActo == 0) {
+                    arrBeans = oParticipaDao.getAll(alFilter, hmOrder, AppConfigurationHelper.getJsonMsgDepth());
+                } else {
+                    arrBeans = oParticipaDao.getAllXActo(idActo, alFilter, hmOrder, AppConfigurationHelper.getJsonMsgDepth());
+                }
                 data = JsonMessage.getJsonExpression(200, AppConfigurationHelper.getGson().toJson(arrBeans));
             } catch (Exception ex) {
                 Log4j.errorLog(this.getClass().getName() + ":" + (ex.getStackTrace()[0]).getMethodName(), ex);
@@ -164,6 +179,9 @@ public class ParticipaService implements TableServiceInterface, ViewServiceInter
         if (this.checkpermission("getpage")) {
             int intRegsPerPag = ParameterCook.prepareRpp(oRequest);
             int intPage = ParameterCook.preparePage(oRequest);
+            // parámetros añadidos para la relación N:M
+            int idActo = ParameterCook.prepareId(oRequest);
+            int idAgrupacion = ParameterCook.prepareForeignId(oRequest);
             HashMap<String, String> hmOrder = ParameterCook.getOrderParams(ParameterCook.prepareOrder(oRequest));
             ArrayList<FilterBeanHelper> alFilter = ParameterCook.getFilterParams(ParameterCook.prepareFilter(oRequest));
             String data = null;
@@ -173,7 +191,17 @@ public class ParticipaService implements TableServiceInterface, ViewServiceInter
                 oDataConnectionSource = getSourceConnection();
                 oConnection = oDataConnectionSource.newConnection();
                 ParticipaDao oParticipaDao = new ParticipaDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), null);
-                List<ParticipaBean> arrBeans = oParticipaDao.getPage(intRegsPerPag, intPage, alFilter, hmOrder, AppConfigurationHelper.getJsonMsgDepth());
+                List<ParticipaBean> arrBeans;
+                if (idActo == 0) {
+                    arrBeans = oParticipaDao.getPage(intRegsPerPag, intPage, alFilter, hmOrder, AppConfigurationHelper.getJsonMsgDepth());
+                } else{
+                    if (idAgrupacion == 0){
+                        arrBeans = oParticipaDao.getPageXActo(idActo, intRegsPerPag, intPage, alFilter, hmOrder, AppConfigurationHelper.getJsonMsgDepth());
+                    } else{
+                        arrBeans = oParticipaDao.getPageXActoXAgrupacion(idActo, idAgrupacion, intRegsPerPag, intPage, alFilter, hmOrder, AppConfigurationHelper.getJsonMsgDepth());
+                    }
+                    
+                }
                 data = JsonMessage.getJsonExpression(200, AppConfigurationHelper.getGson().toJson(arrBeans));
             } catch (Exception ex) {
                 Log4j.errorLog(this.getClass().getName() + ":" + (ex.getStackTrace()[0]).getMethodName(), ex);
@@ -230,22 +258,16 @@ public class ParticipaService implements TableServiceInterface, ViewServiceInter
     public ReplyBean set() throws Exception {
         if (this.checkpermission("set")) {
             String jason = ParameterCook.prepareJson(oRequest);
-            // Se necesita el id para diferenciar un insert de un update enviando como parámetro where al crear el objeto Bean 
-            JsonParser parser = new JsonParser();
-            JsonElement elementObject = parser.parse(jason);
-            String strRequestId;
-            try {
-                strRequestId = elementObject.getAsJsonObject().get("id").getAsString();
-            } catch (Exception e) {
-                strRequestId = "0";
-            }
-            Integer requestId = Integer.parseInt(strRequestId);
+            // Se necesita el id para diferenciar un insert de un update enviando como parámetro where al crear oObraBean
+            Integer id = ParameterCook.prepareId(oRequest);
             String where = "";
-            if (requestId == 0) {
+            if (id == 0) {
                 where = null;
             } else {
-                where += " where id=" + requestId;
+                where += " where id=" + id;
             }
+            // Parámetro añadido para relaciones 1:n
+            int idActo = ParameterCook.prepareForeignId(oRequest);
             // hasta aquí lo que he añadido yo
             ReplyBean oReplyBean = new ReplyBean();
             Connection oConnection = null;
@@ -258,15 +280,32 @@ public class ParticipaService implements TableServiceInterface, ViewServiceInter
 //                ParticipaBean oParticipaBean = new ParticipaBean();
                 ParticipaDao oParticipaDao = new ParticipaDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), where);
                 ParticipaBean oParticipaBean;
-                if (requestId == 0) {
-                    oParticipaBean = new ParticipaBean();
+                // Se crea el objeto según los parámetros que hay
+                if (idActo == 0) {
+                    // para participación
+                    if (id == 0) {
+                        oParticipaBean = new ParticipaBean(); // nueva participación
+                    } else {
+                        oParticipaBean = new ParticipaBean(id); // actualizar una participación 
+                    }
                 } else {
-                    oParticipaBean = new ParticipaBean(requestId);
+                    // para participación en un acto
+                    if (id == 0) {
+                        oParticipaBean = new ParticipaBean(idActo, true); // crear una participación en un acto
+                    } else {
+                        oParticipaBean = new ParticipaBean(id, idActo, true); // actualizar una participación en un acto
+                    }
                 }
                 // hasta aquí es añadido
                 oParticipaBean = AppConfigurationHelper.getGson().fromJson(jason, oParticipaBean.getClass());
                 if (oParticipaBean != null) {
-                    Integer iResult = oParticipaDao.set(oParticipaBean);
+                    Integer iResult;
+                    if (idActo == 0) {
+                        iResult = oParticipaDao.set(oParticipaBean);
+                    } else {
+                        iResult = oParticipaDao.setXActo(oParticipaBean, idActo);
+                    }
+
                     if (iResult >= 1) {
                         oReplyBean.setCode(200);
                         oReplyBean.setJson(JsonMessage.getJsonExpression(200, iResult.toString()));
@@ -298,5 +337,4 @@ public class ParticipaService implements TableServiceInterface, ViewServiceInter
             return new ReplyBean(401, JsonMessage.getJsonMsg(401, "Unauthorized"));
         }
     }
-
 }

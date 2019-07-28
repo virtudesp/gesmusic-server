@@ -85,6 +85,28 @@ public class ParameterCook {
         }
         return foreignId;
     }
+    
+    // Para recuperar la id de la segunda clave ajena en el caso de que exista como parámetro   
+    public static Integer prepareForeignId2(HttpServletRequest request) {
+        int foreignId2;
+        if (request.getParameter("foreign2") == null) {
+            foreignId2 = 0;
+        } else {
+            foreignId2 = Integer.parseInt(request.getParameter("foreign2"));
+        }
+        return foreignId2;
+    }
+    
+    // Para recuperar la id de la 3ª clave ajena en el caso de que exista como parámetro   
+    public static Integer prepareForeignId3(HttpServletRequest request) {
+        int foreignId3;
+        if (request.getParameter("foreign3") == null) {
+            foreignId3 = 0;
+        } else {
+            foreignId3 = Integer.parseInt(request.getParameter("foreign3"));
+        }
+        return foreignId3;
+    }
 
     public static String prepareJson(HttpServletRequest request) {
         String result = null;

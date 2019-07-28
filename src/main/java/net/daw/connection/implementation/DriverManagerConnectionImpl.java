@@ -69,7 +69,12 @@ public class DriverManagerConnectionImpl implements ConnectionInterface {
 //http://localhost:8081/gesmusic-server/json?ob=obra&op=set&id=18&foreign=7&json={"id":"17","subtitulo":"pasodoble"}
 //
 //  N:M
-//http://localhost:8081/gesmusic-server/json?ob=repertorio&op=getpage&id=31
+//http://localhost:8081/gesmusic-server/json?ob=participa&op=getpage&id=31
+//   ob=participa&op=set&id=0&foreign=9&json={"id":"11","subtitulo":"grupo jazz"}
+//   ob=repertorio&op=getpage&id=9&foreign=1
+//   ob=repertorio&op=getpage&foreign=9&foreign2=1
+//   ob=obra&op=getpage&id=9&foreign=1
+//   ob=obra&op=getpage&id=9
 
 ///http://localhost:8081/gesmusic-server/json?ob=elenco&op=set&json={"id_miembro":"1","id_agrupacion":"1","id_rol":"1"}
 //http://localhost:8081/gesmusic-server/json?ob=tipomiembro&op=set&json={"id":"4","tipomiembro":"cocineroooooo"}
@@ -90,7 +95,7 @@ http://localhost:8081/gesmusic-server/json?ob=tipomiembro&op=set&json={"id":4,"t
 
 ob=tipomiembro&op=set&json={"tipomiembro":"casual"}
 
-
+https://github.com/virtudesp/gesmusic-client/blob/master/public_html/js/compositor/plist.js
 
 
 */

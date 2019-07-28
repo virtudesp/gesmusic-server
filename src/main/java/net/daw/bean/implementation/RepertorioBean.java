@@ -44,14 +44,14 @@ public class RepertorioBean implements GenericBean {
     private Integer id = 0;
     
     @Expose(serialize = false)
-    private Integer id_obra;
-    @Expose(deserialize = false)
-    private ObraBean obj_obra = null;
-    
-    @Expose(serialize = false)
     private Integer id_acto;
     @Expose(deserialize = false)
     private ActoBean obj_acto = null;
+    
+    @Expose(serialize = false)
+    private Integer id_obra;
+    @Expose(deserialize = false)
+    private ObraBean obj_obra = null;
     
     @Expose(serialize = false)
     private Integer id_agrupacion;
@@ -64,6 +64,21 @@ public class RepertorioBean implements GenericBean {
     public RepertorioBean(Integer id) {
         this.id = id;
     }
+
+    //Nuevos constructores para las relaciones N:M
+    /*
+    Al haber definido ya un constructor con un Integer como parámetro, no deja definir otro.
+    Para eso he añadido el comodín boolean flag
+    */
+    public RepertorioBean(Integer id_acto, Boolean flag) {
+        this.id_acto = id_acto;
+    }
+    
+    public RepertorioBean(Integer id, Integer id_acto) {
+        this.id = id;
+        this.id_acto = id_acto;
+    }
+
 
     public Integer getId() {
         return id;
@@ -125,8 +140,16 @@ public class RepertorioBean implements GenericBean {
     public String getColumns() {
         String strColumns = "";
         strColumns += "id,";
-        strColumns += "id_obra,";
         strColumns += "id_acto,";
+        strColumns += "id_obra,";
+        strColumns += "id_agrupacion";
+        return strColumns;
+    }
+
+    public String getColumnsXActo() {
+        String strColumns = "";
+        strColumns += "id,";
+        strColumns += "id_obra,";
         strColumns += "id_agrupacion";
         return strColumns;
     }
@@ -135,8 +158,17 @@ public class RepertorioBean implements GenericBean {
     public String getValues() {
         String strColumns = "";
         strColumns += id + ",";
-        strColumns += id_obra + ",";
         strColumns += id_acto + ",";
+        strColumns += id_obra + ",";
+        strColumns += id_agrupacion;
+        return strColumns;
+    }
+
+    public String getValuesXActo(Integer idActo) {
+        String strColumns = "";
+        strColumns += id + ",";
+        strColumns += idActo + ",";
+        strColumns += id_obra + ",";
         strColumns += id_agrupacion;
         return strColumns;
     }
@@ -147,13 +179,13 @@ public class RepertorioBean implements GenericBean {
 //        strPairs += "id_obra=" + id_obra + ",";
 //        strPairs += "id_acto=" + id_acto;
         Boolean hay = false;
-        if (id_obra != null) {
-            strPairs += "id_obra=" + id_obra;
+        if (id_acto != null) {
+            strPairs += "id_acto=" + id_acto;
             hay = true;
         }
-        if (id_acto != null) {
-            strPairs += (hay) ? ",id_acto=" : "id_acto=";
-            strPairs += id_acto;
+        if (id_obra != null) {
+            strPairs += (hay) ? ",id_obra=" : "id_obra=";
+            strPairs += id_obra;
             hay = true;
         }
         if (id_agrupacion != null) {
@@ -163,19 +195,24 @@ public class RepertorioBean implements GenericBean {
         return strPairs;
     }
 
+    public String toPairsXActo(Integer idActo) {
+        String strPairs = "";
+        Boolean hay = false;
+        if (id_obra != null) {
+            strPairs += "id_obra=" + id_obra;
+            hay = true;
+        }
+        if (id_agrupacion != null) {
+            strPairs += (hay) ? ",id_agrupacion=" : "id_agrupacion=";
+            strPairs += id_agrupacion;
+        }
+        return strPairs;
+    }
+
+
     @Override
     public RepertorioBean fill(ResultSet oResultSet, Connection pooledConnection, PusuarioBean oPusuarioBean_security, Integer expand) throws SQLException, Exception {
         this.setId(oResultSet.getInt("id"));
-
-        if (expand > 0) {
-            ObraBean oObraBean = new ObraBean();
-            ObraDao oObraDao = new ObraDao(pooledConnection, oPusuarioBean_security, null);
-            oObraBean.setId(oResultSet.getInt("id_obra"));
-            oObraBean = oObraDao.get(oObraBean, expand - 1);
-            this.setObj_obra(oObraBean);
-        } else {
-            this.setId_obra(oResultSet.getInt("id_obra"));
-        }
 
         if (expand > 0) {
             ActoBean oActoBean = new ActoBean();
@@ -185,6 +222,16 @@ public class RepertorioBean implements GenericBean {
             this.setObj_acto(oActoBean);
         } else {
             this.setId_acto(oResultSet.getInt("id_acto"));
+        }
+
+        if (expand > 0) {
+            ObraBean oObraBean = new ObraBean();
+            ObraDao oObraDao = new ObraDao(pooledConnection, oPusuarioBean_security, null);
+            oObraBean.setId(oResultSet.getInt("id_obra"));
+            oObraBean = oObraDao.get(oObraBean, expand - 1);
+            this.setObj_obra(oObraBean);
+        } else {
+            this.setId_obra(oResultSet.getInt("id_obra"));
         }
 
         if (expand > 0) {

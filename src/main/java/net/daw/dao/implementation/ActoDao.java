@@ -68,11 +68,61 @@ public class ActoDao implements ViewDaoInterface<ActoBean>, TableDaoInterface<Ac
         }
         return pages;
     }
+    
+    // Para obtener los actos en los que se ha interpretado una obra    
+    public Long getCountXHistorial(int idObra, ArrayList<FilterBeanHelper> hmFilter) throws Exception {
+        // definir la nueva  sql
+        strSQLCount = "SELECT COUNT(*) FROM acto a, repertorio r, obra o "
+                + "WHERE o.id = r.id_obra AND a.id = r.id_acto "
+                + "AND o.id = " + idObra;
+        Long pages = 0L;
+        try {
+            pages = oMysql.getCount(strSQLCount);
+        } catch (Exception ex) {
+            Log4j.errorLog(this.getClass().getName() + ":" + (ex.getStackTrace()[0]).getMethodName(), ex);
+            throw new Exception();
+        }
+        return pages;
+    }
 
     @Override
     public ArrayList<ActoBean> getPage(int intRegsPerPag, int intPage, ArrayList<FilterBeanHelper> alFilter, HashMap<String, String> hmOrder, Integer expand) throws Exception {
         strSQL += SqlBuilder.buildSqlWhere(alFilter);
         strSQL += SqlBuilder.buildSqlOrder(hmOrder);
+        strSQL += SqlBuilder.buildSqlLimit(oMysql.getCount(strSQLCount), intRegsPerPag, intPage);
+        ArrayList<ActoBean> arrUser = new ArrayList<>();
+        ResultSet oResultSet = null;
+        try {
+            oResultSet = oMysql.getAllSQL(strSQL);
+            while (oResultSet.next()) {
+                ActoBean oActoBean = new ActoBean();
+                arrUser.add((ActoBean) oActoBean.fill(oResultSet, oConnection, oPuserSecurity, expand));
+            }
+            if (oResultSet != null) {
+                oResultSet.close();
+            }
+        } catch (Exception ex) {
+            Log4j.errorLog(this.getClass().getName() + ":" + (ex.getStackTrace()[0]).getMethodName(), ex);
+            throw new Exception();
+        } finally {
+            if (oResultSet != null) {
+                oResultSet.close();
+            }
+        }
+        return arrUser;
+    }
+    
+    public ArrayList<ActoBean> getPageXHistorial(int idObra, int intRegsPerPag, int intPage, ArrayList<FilterBeanHelper> alFilter, HashMap<String, String> hmOrder, Integer expand) throws Exception {
+        // definir las nuevas sql        
+        strSQLCount = "SELECT COUNT(*) FROM acto a, repertorio r, obra o "
+                + "WHERE o.id = r.id_obra AND a.id = r.id_acto "
+                + "AND o.id = " + idObra;
+        strSQL = "SELECT a.id, a.nombre, IFNULL(a.parte,' ') AS parte, a.lugar, a.fecha "
+                + "FROM acto a, repertorio r, obra o "
+                + "WHERE o.id = r.id_obra AND a.id = r.id_acto "
+                + "AND o.id = " + idObra;
+//        strSQL += SqlBuilder.buildSqlWhere(alFilter);
+//        strSQL += SqlBuilder.buildSqlOrder(hmOrder);
         strSQL += SqlBuilder.buildSqlLimit(oMysql.getCount(strSQLCount), intRegsPerPag, intPage);
         ArrayList<ActoBean> arrUser = new ArrayList<>();
         ResultSet oResultSet = null;

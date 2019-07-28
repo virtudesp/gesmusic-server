@@ -32,6 +32,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.HashMap;
+import net.daw.bean.implementation.ActoBean;
 import net.daw.bean.implementation.PusuarioBean;
 import net.daw.bean.implementation.ObraBean;
 import net.daw.dao.publicinterface.TableDaoInterface;
@@ -78,11 +79,11 @@ public class ObraDao implements ViewDaoInterface<ObraBean>, TableDaoInterface<Ob
         }
         return pages;
     }
-    
+
     // Para la relación compositor --> obras
     public Long getCountXCompositor(int idCompositor, ArrayList<FilterBeanHelper> hmFilter) throws Exception {
         // definir la nueva condición de la sql
-        strSQLCount += " and id_compositor= " + idCompositor + " "; 
+        strSQLCount += " and id_compositor= " + idCompositor + " ";
         strSQLCount += SqlBuilder.buildSqlWhere(hmFilter);
         Long pages = 0L;
         try {
@@ -93,7 +94,40 @@ public class ObraDao implements ViewDaoInterface<ObraBean>, TableDaoInterface<Ob
         }
         return pages;
     }
+
+    // Para obtener las obras de un repertorio
+    public Long getCountXRepertorio(int idActo, int idAgrupacion, ArrayList<FilterBeanHelper> hmFilter) throws Exception {
+        // definir la nueva  sql
+        strSQLCount = "SELECT COUNT(*) FROM repertorio r, obra o, agrupacion ag, acto ac "
+                + "WHERE r.id_acto = ac.id AND r.id_obra = o.id AND r.id_agrupacion = ag.id "
+                + "AND r.id_acto = " + idActo + " AND r.id_agrupacion = " + idAgrupacion;
+//        strSQLCount += SqlBuilder.buildSqlWhere(hmFilter);
+        Long pages = 0L;
+        try {
+            pages = oMysql.getCount(strSQLCount);
+        } catch (Exception ex) {
+            Log4j.errorLog(this.getClass().getName() + ":" + (ex.getStackTrace()[0]).getMethodName(), ex);
+            throw new Exception();
+        }
+        return pages;
+    }
     
+    // Para obtener los actos en los que se ha interpretado una obra    
+    public Long getCountXHistorial(int idObra, ArrayList<FilterBeanHelper> hmFilter) throws Exception {
+        // definir la nueva  sql
+        strSQLCount = "SELECT COUNT(*) FROM acto a, repertorio r, obra o "
+                + "WHERE o.id = r.id_obra AND a.id = r.id_acto "
+                + "AND o.id = " + idObra;
+        Long pages = 0L;
+        try {
+            pages = oMysql.getCount(strSQLCount);
+        } catch (Exception ex) {
+            Log4j.errorLog(this.getClass().getName() + ":" + (ex.getStackTrace()[0]).getMethodName(), ex);
+            throw new Exception();
+        }
+        return pages;
+    }
+
     @Override
     public ArrayList<ObraBean> getPage(int intRegsPerPag, int intPage, ArrayList<FilterBeanHelper> alFilter, HashMap<String, String> hmOrder, Integer expand) throws Exception {
         strSQL += SqlBuilder.buildSqlWhere(alFilter);
@@ -122,10 +156,10 @@ public class ObraDao implements ViewDaoInterface<ObraBean>, TableDaoInterface<Ob
     }
 
     public ArrayList<ObraBean> getPageXCompositor(int idCompositor, int intRegsPerPag, int intPage, ArrayList<FilterBeanHelper> alFilter, HashMap<String, String> hmOrder, Integer expand) throws Exception {
-        // definir la nueva condición de la sql
-        strSQLCount += " and id_compositor= " + idCompositor + " ";  
-        strSQL += " and id_compositor= " + idCompositor + " ";        
-        strSQL += SqlBuilder.buildSqlWhere(alFilter);        
+        // definir las nuevas sql
+        strSQLCount += " and id_compositor= " + idCompositor + " ";
+        strSQL += " and id_compositor= " + idCompositor + " ";
+        strSQL += SqlBuilder.buildSqlWhere(alFilter);
         strSQL += SqlBuilder.buildSqlOrder(hmOrder);
         strSQL += SqlBuilder.buildSqlLimit(oMysql.getCount(strSQLCount), intRegsPerPag, intPage);
         ArrayList<ObraBean> arrUser = new ArrayList<>();
@@ -149,7 +183,86 @@ public class ObraDao implements ViewDaoInterface<ObraBean>, TableDaoInterface<Ob
         }
         return arrUser;
     }
+    
+    public ArrayList<ObraBean> getPageXRepertorio(int idActo, int idAgrupacion, int intRegsPerPag, int intPage, ArrayList<FilterBeanHelper> alFilter, HashMap<String, String> hmOrder, Integer expand) throws Exception {
+        // definir las nuevas sql
+        strSQLCount = "SELECT COUNT(*) FROM repertorio r, obra o, agrupacion ag, acto ac "
+                + "WHERE r.id_acto = ac.id AND r.id_obra = o.id AND r.id_agrupacion = ag.id "
+                + "AND r.id_acto = " + idActo + " AND r.id_agrupacion = " + idAgrupacion;
+        strSQL = "SELECT o.titulo, o.subtitulo, o.notas, o.id_compositor "
+                + "FROM repertorio r, obra o, agrupacion ag, acto ac "
+                + "WHERE r.id_acto = ac.id AND r.id_obra = o.id AND r.id_agrupacion = ag.id "
+                + "AND r.id_acto = " + idActo + " AND r.id_agrupacion = " + idAgrupacion;
+//        strSQL += SqlBuilder.buildSqlWhere(alFilter);
+//        strSQL += SqlBuilder.buildSqlOrder(hmOrder);
+        strSQL += SqlBuilder.buildSqlLimit(oMysql.getCount(strSQLCount), intRegsPerPag, intPage);
+        ArrayList<ObraBean> arrUser = new ArrayList<>();
+        ResultSet oResultSet = null;
+        try {
+            oResultSet = oMysql.getAllSQL(strSQL);
+            while (oResultSet.next()) {
+                ObraBean oUserBean = new ObraBean();
+                arrUser.add((ObraBean) oUserBean.fill(oResultSet, oConnection, oPuserSecurity, expand));
+            }
+            if (oResultSet != null) {
+                oResultSet.close();
+            }
+        } catch (Exception ex) {
+            Log4j.errorLog(this.getClass().getName() + ":" + (ex.getStackTrace()[0]).getMethodName(), ex);
+            throw new Exception();
+        } finally {
+            if (oResultSet != null) {
+                oResultSet.close();
+            }
+        }
+        return arrUser;
+    }
 
+    public ArrayList<ActoBean> getPageXHistorial(int idObra, int intRegsPerPag, int intPage, ArrayList<FilterBeanHelper> alFilter, HashMap<String, String> hmOrder, Integer expand) throws Exception {
+        // definir las nuevas sql        
+        strSQLCount = "SELECT COUNT(*) FROM acto a, repertorio r, obra o "
+                + "WHERE o.id = r.id_obra AND a.id = r.id_acto "
+                + "AND o.id = " + idObra;
+        strSQL = "SELECT a.nombre, IFNULL(a.parte,' ') AS parte, a.lugar, a.fecha "
+                + "FROM acto a, repertorio r, obra o "
+                + "WHERE o.id = r.id_obra AND a.id = r.id_acto "
+                + "AND o.id = " + idObra;
+//        strSQL += SqlBuilder.buildSqlWhere(alFilter);
+//        strSQL += SqlBuilder.buildSqlOrder(hmOrder);
+        strSQL += SqlBuilder.buildSqlLimit(oMysql.getCount(strSQLCount), intRegsPerPag, intPage);
+        ArrayList<ActoBean> arrUser = new ArrayList<>();
+        ResultSet oResultSet = null;
+        try {
+            oResultSet = oMysql.getAllSQL(strSQL);
+            while (oResultSet.next()) {
+                ActoBean oActoBean = new ActoBean();
+                arrUser.add((ActoBean) oActoBean.fill(oResultSet, oConnection, oPuserSecurity, expand));
+            }
+            if (oResultSet != null) {
+                oResultSet.close();
+            }
+        } catch (Exception ex) {
+            Log4j.errorLog(this.getClass().getName() + ":" + (ex.getStackTrace()[0]).getMethodName(), ex);
+            throw new Exception();
+        } finally {
+            if (oResultSet != null) {
+                oResultSet.close();
+            }
+        }
+        return arrUser;
+    }
+
+    /*
+    
+        // Nueva SQL
+SELECT a.nombre, IFNULL(a.parte,' ') AS parte, a.lugar, a.fecha 
+FROM acto a, repertorio r, obra o 
+WHERE 1
+AND o.id = r.id_obra
+AND a.id = r.id_acto
+AND o.id = 29
+//                + "AND r.id_acto = " + idActo + " AND r.id_agrupacion = " + idAgrupacion;
+     */
     @Override
     public ArrayList<ObraBean> getAll(ArrayList<FilterBeanHelper> alFilter, HashMap<String, String> hmOrder, Integer expand) throws Exception {
         strSQL += SqlBuilder.buildSqlWhere(alFilter);
@@ -172,7 +285,7 @@ public class ObraDao implements ViewDaoInterface<ObraBean>, TableDaoInterface<Ob
         }
         return arrUser;
     }
-    
+
     // Para obtener todas las obras de un compositor    @Override
     public ArrayList<ObraBean> getAllXCompositor(int idCompositor, ArrayList<FilterBeanHelper> alFilter, HashMap<String, String> hmOrder, Integer expand) throws Exception {
         // definir la nueva condición de la sql
@@ -247,7 +360,7 @@ public class ObraDao implements ViewDaoInterface<ObraBean>, TableDaoInterface<Ob
         }
         return iResult;
     }
-    
+
     // Dado un compositor, crear una nueva obra o modificar una ya existente
     public Integer setXCompositor(ObraBean oObraBean, Integer idCompositor) throws Exception {
         Integer iResult = null;

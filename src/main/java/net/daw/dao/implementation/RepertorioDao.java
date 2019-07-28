@@ -32,6 +32,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.HashMap;
+import net.daw.bean.implementation.ObraBean;
 import net.daw.bean.implementation.RepertorioBean;
 import net.daw.bean.implementation.PusuarioBean;
 import net.daw.dao.publicinterface.TableDaoInterface;
@@ -45,14 +46,15 @@ public class RepertorioDao implements ViewDaoInterface<RepertorioBean>, TableDao
 
     private String strTable = "repertorio";
     /*
-    SELECT ac.nombre, o.titulo, ag.agrupacion
-FROM repertorio r, obra o, agrupacion ag, acto ac
+   SELECT o.titulo, o.subtitulo, o.notas, CONCAT(co.nombre, ' ', co.apellidos)
+FROM repertorio r, obra o, agrupacion ag, acto ac, compositor co
 WHERE r.id_acto = ac.id
 AND r.id_obra = o.id
+AND o.id_compositor = co.id
 AND r.id_agrupacion = ag.id
 AND r.id_acto = 31
 ORDER BY r.id_agrupacion
-    */
+     */
     private String strSQL = "select * from " + strTable + " where 1=1 ";
     private String strSQLCount = "SELECT COUNT(*) FROM " + strTable + " WHERE 1=1 ";
 //    private String strSQL = "SELECT ac.nombre, o.titulo, ag.agrupacion FROM repertorio r, obra o, agrupacion ag, acto ac "
@@ -86,12 +88,12 @@ ORDER BY r.id_agrupacion
             throw new Exception();
         }
         return pages;
-    }   
-    
+    }
+
     // Para contar las obras del repertorio de un acto - Relación N:M
-    public Long getCountXActo(int idActo, ArrayList<FilterBeanHelper> hmFilter) throws Exception {
+    public Long getCountXActo(int idActo, int idAgrupacion, ArrayList<FilterBeanHelper> hmFilter) throws Exception {
         // definir la nueva condición de la sql
-        strSQLCount += " and id_acto= " + idActo + " "; 
+        strSQLCount += " AND id_acto= " + idActo + " AND id_agrupacion=" + idAgrupacion;
         strSQLCount += SqlBuilder.buildSqlWhere(hmFilter);
         Long pages = 0L;
         try {
@@ -109,6 +111,7 @@ ORDER BY r.id_agrupacion
 //        strSQL += SqlBuilder.buildSqlOrder(hmOrder);
         strSQL += " ORDER BY id_agrupacion";
         strSQL += SqlBuilder.buildSqlLimit(oMysql.getCount(strSQLCount), intRegsPerPag, intPage);
+//        ArrayList<RepertorioBean> arrRepertorio = new ArrayList<>();
         ArrayList<RepertorioBean> arrRepertorio = new ArrayList<>();
         ResultSet oResultSet = null;
         try {
@@ -131,21 +134,29 @@ ORDER BY r.id_agrupacion
         return arrRepertorio;
     }
 
-    public ArrayList<RepertorioBean> getPageXActo(int idActo, int intRegsPerPag, int intPage, ArrayList<FilterBeanHelper> alFilter, HashMap<String, String> hmOrder, Integer expand) throws Exception {
+//    La consulta del repertorio devuelve un array de obras
+    public ArrayList<ObraBean> getPageXActo(int idActo, int idAgrupacion, int intRegsPerPag, int intPage, ArrayList<FilterBeanHelper> alFilter, HashMap<String, String> hmOrder, Integer expand) throws Exception {
         // definir la nueva condición de la sql
-        strSQLCount += " and id_acto= " + idActo + " ";  
-        strSQL += " AND id_acto= " + idActo + " ";        
-        strSQL += SqlBuilder.buildSqlWhere(alFilter);        
-//        strSQL += SqlBuilder.buildSqlOrder(hmOrder);
-        strSQL += " ORDER BY id_agrupacion";
+        strSQLCount += " AND id_acto= " + idActo + " AND id_agrupacion=" + idAgrupacion;
+//        strSQL += " AND id_acto= " + idActo + " AND id_agrupacion=" + idAgrupacion;
+        // Nueva SQL
+        strSQL = "SELECT o.id, o.titulo, IFNULL(o.subtitulo,' ') AS subtitulo, IFNULL(o.notas,' ') AS notas, o.id_compositor "
+                + "FROM repertorio r, obra o, agrupacion ag, acto ac "
+                + "WHERE r.id_acto = ac.id AND r.id_obra = o.id AND r.id_agrupacion = ag.id "
+                + "AND r.id_acto = " + idActo + " AND r.id_agrupacion = " + idAgrupacion;
+        strSQL += SqlBuilder.buildSqlWhere(alFilter);
+        strSQL += SqlBuilder.buildSqlOrder(hmOrder);
         strSQL += SqlBuilder.buildSqlLimit(oMysql.getCount(strSQLCount), intRegsPerPag, intPage);
-        ArrayList<RepertorioBean> arrUser = new ArrayList<>();
+//        ArrayList<RepertorioBean> arrUser = new ArrayList<>();
+        ArrayList<ObraBean> arrUser = new ArrayList<>();
         ResultSet oResultSet = null;
         try {
             oResultSet = oMysql.getAllSQL(strSQL);
             while (oResultSet.next()) {
-                RepertorioBean oUserBean = new RepertorioBean();
-                arrUser.add((RepertorioBean) oUserBean.fill(oResultSet, oConnection, oPusuarioSecurity, expand));
+//                RepertorioBean oUserBean = new RepertorioBean();
+                ObraBean oUserBean = new ObraBean();
+//                arrUser.add((RepertorioBean) oUserBean.fill(oResultSet, oConnection, oPusuarioSecurity, expand));
+                arrUser.add((ObraBean) oUserBean.fill(oResultSet, oConnection, oPusuarioSecurity, expand));
             }
             if (oResultSet != null) {
                 oResultSet.close();
@@ -182,9 +193,9 @@ ORDER BY r.id_agrupacion
             }
         }
         return arrRepertorio;
-    }    
+    }
 
-    // Para obtener todas las obras de un compositor 
+    // Para obtener todas las obras de un acto 
     public ArrayList<RepertorioBean> getAllXActo(int idActo, ArrayList<FilterBeanHelper> alFilter, HashMap<String, String> hmOrder, Integer expand) throws Exception {
         // definir la nueva condición de la sql
         strSQL += " AND id_acto= " + idActo + " ";

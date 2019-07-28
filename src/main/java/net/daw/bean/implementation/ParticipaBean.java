@@ -59,6 +59,20 @@ public class ParticipaBean implements GenericBean {
         this.id = id;
     }
 
+    //Nuevos constructores para las relaciones N:M
+    /*
+    Al haber definido ya un constructor con un Integer como parámetro, no deja definir otro.
+    Para eso he añadido el comodín boolean flag
+    */
+    public ParticipaBean(Integer id_acto, Boolean flag) {
+        this.id_acto = id_acto;
+    }
+    
+    public ParticipaBean(Integer id, Integer id_acto, Boolean flag) {
+        this.id = id;
+        this.id_acto = id_acto;
+    }
+
     public Integer getId() {
         return id;
     }
@@ -109,6 +123,13 @@ public class ParticipaBean implements GenericBean {
         return strColumns;
     }
 
+    public String getColumnsXActo() {
+        String strColumns = "";
+        strColumns += "id,";
+        strColumns += "id_agrupacion";
+        return strColumns;
+    }
+
     @Override
     public String getValues() {
         String strColumns = "";
@@ -118,11 +139,17 @@ public class ParticipaBean implements GenericBean {
         return strColumns;
     }
 
+    public String getValuesXActo(Integer idActo) {
+        String strColumns = "";
+        strColumns += id + ",";
+        strColumns += idActo + ",";
+        strColumns += id_agrupacion;
+        return strColumns;
+    }
+
     @Override
     public String toPairs() {
         String strPairs = "";
-//        strPairs += "id_agrupacion=" + id_agrupacion + ",";
-//        strPairs += "id_acto=" + id_acto;
         Boolean hay = false;
         if (id_acto != null) {
             strPairs += "id_acto=" + id_acto;
@@ -130,7 +157,15 @@ public class ParticipaBean implements GenericBean {
         }
         if (id_agrupacion != null) {
             strPairs += (hay) ? ",id_agrupacion=" : "id_agrupacion=";
-            strPairs += id_acto;
+            strPairs += id_agrupacion;
+        }
+        return strPairs;
+    }
+
+    public String toPairsXActo(Integer idActo) {
+        String strPairs = "";
+        if (id_agrupacion != null) {
+            strPairs += "id_agrupacion=" + id_agrupacion;
         }
         return strPairs;
     }

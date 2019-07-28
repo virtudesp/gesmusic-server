@@ -45,6 +45,7 @@ public class ParticipaDao implements ViewDaoInterface<ParticipaBean>, TableDaoIn
 
     private String strTable = "participa";
     private String strSQL = "select * from " + strTable + " where 1=1 ";
+//    private String strSQL = "SELECT DISTINCT ag.agrupacion FROM participa p, acto a, agrupacion ag WHERE 1=1 ";
     private String strSQLCount = "SELECT COUNT(*) FROM " + strTable + " WHERE 1=1 ";
     private MysqlData oMysql = null;
     private Connection oConnection = null;
@@ -66,6 +67,21 @@ public class ParticipaDao implements ViewDaoInterface<ParticipaBean>, TableDaoIn
 
     @Override
     public Long getCount(ArrayList<FilterBeanHelper> hmFilter) throws Exception {
+        strSQLCount += SqlBuilder.buildSqlWhere(hmFilter);
+        Long pages = 0L;
+        try {
+            pages = oMysql.getCount(strSQLCount);
+        } catch (Exception ex) {
+            Log4j.errorLog(this.getClass().getName() + ":" + (ex.getStackTrace()[0]).getMethodName(), ex);
+            throw new Exception();
+        }
+        return pages;
+    } 
+    
+    // Para contar las agrupaciones que participan en un acto - Relación N:M
+    public Long getCountXActo(int idActo, ArrayList<FilterBeanHelper> hmFilter) throws Exception {
+        // definir la nueva condición de la sql
+        strSQLCount += "AND id_acto = " + idActo; 
         strSQLCount += SqlBuilder.buildSqlWhere(hmFilter);
         Long pages = 0L;
         try {
@@ -104,6 +120,66 @@ public class ParticipaDao implements ViewDaoInterface<ParticipaBean>, TableDaoIn
         return arrParticipa;
     }
 
+    // Para mostrar una página de la participación en un acto
+    public ArrayList<ParticipaBean> getPageXActo(int idActo, int intRegsPerPag, int intPage, ArrayList<FilterBeanHelper> alFilter, HashMap<String, String> hmOrder, Integer expand) throws Exception {
+        // definir la nueva condición de la sql
+        strSQLCount += " AND id_acto= " + idActo; 
+        strSQL += " AND id_acto= " + idActo;   
+//        strSQL += " AND p.id_acto = " + idActo + " AND p.id_agrupacion = ag.id";        
+        strSQL += SqlBuilder.buildSqlWhere(alFilter);        
+//        strSQL += SqlBuilder.buildSqlOrder(hmOrder);
+        strSQL += SqlBuilder.buildSqlLimit(oMysql.getCount(strSQLCount), intRegsPerPag, intPage);
+        ArrayList<ParticipaBean> arrUser = new ArrayList<>();
+        ResultSet oResultSet = null;
+        try {
+            oResultSet = oMysql.getAllSQL(strSQL);
+            while (oResultSet.next()) {
+                ParticipaBean oUserBean = new ParticipaBean();
+                arrUser.add((ParticipaBean) oUserBean.fill(oResultSet, oConnection, oPusuarioSecurity, expand));
+            }
+            if (oResultSet != null) {
+                oResultSet.close();
+            }
+        } catch (Exception ex) {
+            Log4j.errorLog(this.getClass().getName() + ":" + (ex.getStackTrace()[0]).getMethodName(), ex);
+            throw new Exception();
+        } finally {
+            if (oResultSet != null) {
+                oResultSet.close();
+            }
+        }
+        return arrUser;
+    }
+    // Para mostrar una página de la participación en un acto
+    public ArrayList<ParticipaBean> getPageXActoXAgrupacion(int idActo, int idAgrupacion, int intRegsPerPag, int intPage, ArrayList<FilterBeanHelper> alFilter, HashMap<String, String> hmOrder, Integer expand) throws Exception {
+        // definir la nueva condición de la sql
+        strSQLCount += " AND id_acto= " + idActo + " AND id_agrupacion=" + idAgrupacion;  
+        strSQL += " AND id_acto= " + idActo + " AND id_agrupacion=" + idAgrupacion;           
+        strSQL += SqlBuilder.buildSqlWhere(alFilter);        
+//        strSQL += SqlBuilder.buildSqlOrder(hmOrder);
+        strSQL += SqlBuilder.buildSqlLimit(oMysql.getCount(strSQLCount), intRegsPerPag, intPage);
+        ArrayList<ParticipaBean> arrUser = new ArrayList<>();
+        ResultSet oResultSet = null;
+        try {
+            oResultSet = oMysql.getAllSQL(strSQL);
+            while (oResultSet.next()) {
+                ParticipaBean oUserBean = new ParticipaBean();
+                arrUser.add((ParticipaBean) oUserBean.fill(oResultSet, oConnection, oPusuarioSecurity, expand));
+            }
+            if (oResultSet != null) {
+                oResultSet.close();
+            }
+        } catch (Exception ex) {
+            Log4j.errorLog(this.getClass().getName() + ":" + (ex.getStackTrace()[0]).getMethodName(), ex);
+            throw new Exception();
+        } finally {
+            if (oResultSet != null) {
+                oResultSet.close();
+            }
+        }
+        return arrUser;
+    }
+
     @Override
     public ArrayList<ParticipaBean> getAll(ArrayList<FilterBeanHelper> alFilter, HashMap<String, String> hmOrder, Integer expand) throws Exception {
         strSQL += SqlBuilder.buildSqlWhere(alFilter);
@@ -125,6 +201,32 @@ public class ParticipaDao implements ViewDaoInterface<ParticipaBean>, TableDaoIn
             }
         }
         return arrParticipa;
+    }
+
+    // Para obtener todas las participaciones en un acto 
+    public ArrayList<ParticipaBean> getAllXActo(int idActo, ArrayList<FilterBeanHelper> alFilter, HashMap<String, String> hmOrder, Integer expand) throws Exception {
+        // definir la nueva condición de la sql
+//        strSQL += " AND id_acto= " + idActo + " ";
+        strSQL += " WHERE p.id_acto = " + idActo + " AND p.id_agrupacion = ag.id";
+        strSQL += SqlBuilder.buildSqlWhere(alFilter);
+//        strSQL += SqlBuilder.buildSqlOrder(hmOrder);
+        ArrayList<ParticipaBean> arrUser = new ArrayList<>();
+        ResultSet oResultSet = null;
+        try {
+            oResultSet = oMysql.getAllSQL(strSQL);
+            while (oResultSet.next()) {
+                ParticipaBean oUserBean = new ParticipaBean();
+                arrUser.add((ParticipaBean) oUserBean.fill(oResultSet, oConnection, oPusuarioSecurity, expand));
+            }
+        } catch (Exception ex) {
+            Log4j.errorLog(this.getClass().getName() + ":" + (ex.getStackTrace()[0]).getMethodName(), ex);
+            throw new Exception();
+        } finally {
+            if (oResultSet != null) {
+                oResultSet.close();
+            }
+        }
+        return arrUser;
     }
 
     @Override
@@ -176,6 +278,28 @@ public class ParticipaDao implements ViewDaoInterface<ParticipaBean>, TableDaoIn
         }
         return iResult;
     }
+    
+    // Dado una participación en un acto, crear una nueva o modificar una ya existente
+    public Integer setXActo(ParticipaBean oParticipaBean, Integer idActo) throws Exception {
+        Integer iResult = null;
+        try {
+            if (oParticipaBean.getId() == 0) {
+                strSQL = "INSERT INTO " + strTable + " ";
+                strSQL += "(" + oParticipaBean.getColumns() + ")";
+                strSQL += "VALUES(" + oParticipaBean.getValuesXActo(idActo) + ")";
+                iResult = oMysql.executeInsertSQL(strSQL);
+            } else {
+                strSQL = "UPDATE " + strTable;
+                strSQL += " SET " + oParticipaBean.toPairsXActo(idActo);
+                strSQL += " WHERE id=" + oParticipaBean.getId();
+                iResult = oMysql.executeUpdateSQL(strSQL);
+            }
+        } catch (Exception ex) {
+            Log4j.errorLog(this.getClass().getName() + ":" + (ex.getStackTrace()[0]).getMethodName(), ex);
+            throw new Exception();
+        }
+        return iResult;
+    }
 
     @Override
     public Integer remove(Integer id) throws Exception {
@@ -188,5 +312,4 @@ public class ParticipaDao implements ViewDaoInterface<ParticipaBean>, TableDaoIn
         }
         return result;
     }
-
 }

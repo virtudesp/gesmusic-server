@@ -47,6 +47,8 @@ public class ActoService implements TableServiceInterface, ViewServiceInterface 
     @Override
     public ReplyBean getcount() throws Exception {
         if (this.checkpermission("getcount")) {
+            // parámetro añadido
+            int idObra = ParameterCook.prepareId(oRequest);
             String data = null;
             ArrayList<FilterBeanHelper> alFilter = ParameterCook.getFilterParams(ParameterCook.prepareFilter(oRequest));
             Connection oConnection = null;
@@ -56,7 +58,14 @@ public class ActoService implements TableServiceInterface, ViewServiceInterface 
                 oDataConnectionSource = getSourceConnection();
                 oConnection = oDataConnectionSource.newConnection();
                 ActoDao oActoDao = new ActoDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), null);
-                data = JsonMessage.getJsonExpression(200, Long.toString(oActoDao.getCount(alFilter)));
+                // Si hay idObra es para obtener su historial
+                if (idObra == 0) {
+                    data = JsonMessage.getJsonExpression(200, Long.toString(oActoDao.getCount(alFilter)));
+                } // Si hay idObra es para obtener el historial
+                else {
+                    data = JsonMessage.getJsonExpression(200, Long.toString(oActoDao.getCountXHistorial(idObra, alFilter)));
+                }
+//                data = JsonMessage.getJsonExpression(200, Long.toString(oActoDao.getCount(alFilter)));
             } catch (Exception ex) {
                 Log4j.errorLog(this.getClass().getName() + ":" + (ex.getStackTrace()[0]).getMethodName(), ex);
                 throw new Exception();
@@ -142,6 +151,8 @@ public class ActoService implements TableServiceInterface, ViewServiceInterface 
         if (this.checkpermission("getpage")) {
             int intRegsPerPag = ParameterCook.prepareRpp(oRequest);
             int intPage = ParameterCook.preparePage(oRequest);
+            // parámetro añadido
+            int idObra = ParameterCook.prepareId(oRequest);
             HashMap<String, String> hmOrder = ParameterCook.getOrderParams(ParameterCook.prepareOrder(oRequest));
             ArrayList<FilterBeanHelper> alFilter = ParameterCook.getFilterParams(ParameterCook.prepareFilter(oRequest));
             String data = null;
@@ -151,7 +162,13 @@ public class ActoService implements TableServiceInterface, ViewServiceInterface 
                 oDataConnectionSource = getSourceConnection();
                 oConnection = oDataConnectionSource.newConnection();
                 ActoDao oActoDao = new ActoDao(oConnection, (PusuarioBean) oRequest.getSession().getAttribute("userBean"), null);
-                List<ActoBean> arrBeans = oActoDao.getPage(intRegsPerPag, intPage, alFilter, hmOrder, AppConfigurationHelper.getJsonMsgDepth());
+                List<ActoBean> arrBeans; 
+                // Si hay idObra, es para el historial de actos en los que se ha tocado
+                if(idObra == 0){
+                    arrBeans = oActoDao.getPage(intRegsPerPag, intPage, alFilter, hmOrder, AppConfigurationHelper.getJsonMsgDepth());
+                } else{
+                    arrBeans = oActoDao.getPageXHistorial(idObra, intRegsPerPag, intPage, alFilter, hmOrder, AppConfigurationHelper.getJsonMsgDepth());
+                }                
                 data = JsonMessage.getJsonExpression(200, AppConfigurationHelper.getGson().toJson(arrBeans));
             } catch (Exception ex) {
                 Log4j.errorLog(this.getClass().getName() + ":" + (ex.getStackTrace()[0]).getMethodName(), ex);
@@ -212,9 +229,9 @@ public class ActoService implements TableServiceInterface, ViewServiceInterface 
             JsonParser parser = new JsonParser();
             JsonElement elementObject = parser.parse(jason);
             String strRequestId;
-            try{
+            try {
                 strRequestId = elementObject.getAsJsonObject().get("id").getAsString();
-            } catch (Exception e){
+            } catch (Exception e) {
                 strRequestId = "0";
             }
             Integer requestId = Integer.parseInt(strRequestId);
